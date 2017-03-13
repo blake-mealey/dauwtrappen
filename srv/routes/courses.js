@@ -13,10 +13,10 @@ var config = {
 
 /* GET search page. */
 router.get('/', function(req, res, next) {
-	res.render('search', { title: 'Dauwtrappen' });
+	res.render('courses', { title: 'Dauwtrappen' });
 });
 
-router.get('/coursedata', function(req, res, next) {
+router.get('/data', function(req, res, next) {
 	var client = new Client(config);
 	client.connect();
 	client.query('SELECT * FROM public.course', function(err, result) {

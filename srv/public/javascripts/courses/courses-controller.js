@@ -10,7 +10,7 @@ $(document).ready(function () {
 		}
 	});
 
-	$.get("search/coursedata", function(data, status) {
+	$.get("data", function(data) {
 		if(data) {
 			for (var i = 0; i < data.length; i++) {
 				var course = data[i];
