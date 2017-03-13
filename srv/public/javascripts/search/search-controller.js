@@ -16,11 +16,13 @@ $(document).ready(function () {
 				var course = data[i];
 				console.log(course);
 
+				$a = $("<a href='#'>");
 				$li = $("<li>", {
 					text: course.name
 				});
 
-				$("#courses-list").append($li);
+				$a.append($li);
+				$("#courses-list").append($a);
 			}
 		}
 	});
