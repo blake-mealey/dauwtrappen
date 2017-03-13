@@ -154,6 +154,7 @@ new pg.Pool(config).connect(function (err, c) {
 
 
 	// INSERT TEST DATA
+	// TODO: Move to separate file
 
 	query("INSERT INTO user_account VALUES(" +
 		"'blakemealey@gmail.com', 'pass')");
@@ -167,11 +168,13 @@ new pg.Pool(config).connect(function (err, c) {
 	query("INSERT INTO faculty_contains VALUES(" +
 		"'Science', 'CPSC')");
 
+	var desc = "An introduction to the Unix operating system, including the text editor \"emacs,\" its programming modes and macros; shell usage (including \"sh\" and \"tcsh\"); and some advanced Unix commands.";
 	query("INSERT INTO course VALUES(" +
-		"'Introduction to UNIX', '[An intro to the UNIX OS...]', 101, 'CPSC')");
+		"'Introduction to UNIX', '" + desc + "', 101, 'CPSC')");
 
+	desc = "Unix signals, processes, and file system; interprocess communication; advanced shell programming; program profiling.";
 	query("INSERT INTO course VALUES(" +
-		"'Advanced UNIX', '[More UNIX stuff...]', 102, 'CPSC')");
+		"'Advanced UNIX', '" + desc + "', 102, 'CPSC')");
 
 	query("INSERT INTO degree VALUES(" +
 		"'BSC in Computer Science', 'CPSC')");

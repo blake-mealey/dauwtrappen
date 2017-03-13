@@ -3,23 +3,22 @@ extends layout
 block head
 	link(rel='stylesheet', href='/stylesheets/layout-default-latest.css')
 	link(rel='stylesheet', href='/stylesheets/courses-style.css')
+	link(rel='stylesheet', href='/stylesheets/inspire-tree.css')
 
 	script(type="text/javascript" src='/javascripts/courses/jquery-2.1.1.js')
 	script(type="text/javascript" src='/javascripts/courses/jquery-ui-1.11.0.js')
 	script(type="text/javascript" src='/javascripts/courses/jquery.layout.min.js')
 
+	script(type="text/javascript" src='/javascripts/courses/inspire-tree-bundled.min.js')
 	script(type="text/javascript" src='/javascripts/courses/courses-controller.js')
 
 block content
-	div.ui-layout-north
+	.ui-layout-north
 		h1= title
-	div.ui-layout-west
+	.ui-layout-west
 		form(action="#")
-			div.mdl-textfield.mdl-js-textfield#search-box
+			.mdl-textfield.mdl-js-textfield#search-box
 				input.mdl-textfield__input#search-box-input(type="text")
 				label.mdl-textfield__label(for="search-box-input") Search...
-			ul#courses-list
-
-
-
-	div.ui-layout-center
+		#courses-list
+	.ui-layout-center
