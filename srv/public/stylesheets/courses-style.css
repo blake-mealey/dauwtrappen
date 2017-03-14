@@ -29,10 +29,6 @@
   color: #FFFFFF;
   display: flex;
   align-items: center; }
-  #bread-crumbs .current-crumb {
-    opacity: 0.9; }
-  #bread-crumbs .bread-crumb-tag:hover {
-    opacity: 1; }
   #bread-crumbs .bread-crumb {
     font-size: 24px;
     display: inline-block;
@@ -47,6 +43,10 @@
       color: #FFFFFF;
       text-decoration: none;
       font-size: 24px; }
+  #bread-crumbs .current-crumb {
+    opacity: 0.9; }
+  #bread-crumbs .bread-crumb-tag:hover {
+    opacity: 1; }
 
 #content {
   padding: 10px; }
