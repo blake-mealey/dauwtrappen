@@ -1,9 +1,9 @@
 $(document).ready(function () {
 	$('body').layout({
-		applyDefaultStyles: true,
 		north: {
 			resizable: false,
-			closable: false
+			closable: false,
+			spacing_open: 0
 		},
 		west: {
 			closable: false,

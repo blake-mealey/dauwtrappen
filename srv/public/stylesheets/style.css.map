@@ -1,0 +1,10 @@
+{
+	"version": 3,
+	"file": "style.css",
+	"sources": [
+		"style.sass",
+		"_colors.sass"
+	],
+	"mappings": "AAEA,AAAA,IAAI,CAAC;EACH,OAAO,EAAE,CAAE;EACX,gBAAgB,ECCC,OAAO,GDDc",
+	"names": []
+}
