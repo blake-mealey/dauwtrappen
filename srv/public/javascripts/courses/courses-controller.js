@@ -78,6 +78,50 @@ function loadTree() {
 	window.onpopstate = history.onpushstate = reloadContent;
 }
 
+function crumb($crumbs, text, link, last) {
+	$crumb = $("<div>", {
+		class: "bread-crumb bread-crumb-tag " + (last ? "current-crumb" : "")
+	});
+	$a = $("<a href='" + link + "'>");
+	$a.text(text);
+	$a.click(function(e) {
+		e.preventDefault();
+		history.pushState(null, null, link);
+		reloadContent();
+	});
+	$crumb.append($a);
+	$crumbs.append($crumb);
+
+	if(!last) {
+		$next = $("<div>", {
+			class: "bread-crumb material-icons",
+			text: "navigate_next"
+		});
+		$crumbs.append($next);
+	}
+}
+
+function resetBreadcrumbs(faculty, dept, level) {
+	$crumbs = $("#bread-crumbs");
+	$crumbs.empty();
+
+	// TODO: replace link click with history.pushState
+	var link = "/courses";
+	crumb($crumbs, "Home", link, !faculty);
+	if (faculty) {
+		link += "/" + faculty;
+		crumb($crumbs, faculty, link, !dept);
+		if (dept) {
+			link += "/" + dept;
+			crumb($crumbs, dept, link, !level);
+			if (level) {
+				link += "/" + level;
+				crumb($crumbs, level, link, true);
+			}
+		}
+	}
+}
+
 var lastUrl;
 var $content;
 function reloadContent() {
@@ -85,9 +129,10 @@ function reloadContent() {
 	if (lastUrl && url != lastUrl) return;
 	var parts = url.split("/");
 
-	$content = $(".ui-layout-center");
+	$content = $("#content");
 	$content.empty();
 
+	resetBreadcrumbs(parts[4], parts[5], parts[6]);
 	var faculty = parts[4];
 
 	if(faculty && faculty.trim() != '') {

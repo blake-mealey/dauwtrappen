@@ -14,7 +14,7 @@ block head
 
 block content
 	.ui-layout-north
-		h1= title
+		h2= title
 	.ui-layout-west
 		form(action="#")
 			.mdl-textfield.mdl-js-textfield#search-box
@@ -22,3 +22,13 @@ block content
 				label.mdl-textfield__label(for="search-box-input") Search...
 		#courses-list
 	.ui-layout-center
+		#bread-crumbs
+			.bread-crumb
+				a(href="/courses/Science") Science
+			.bread-crumb.material-icons navigate_next
+			.bread-crumb
+				a(href="/courses/Science") CPSC
+			.bread-crumb.material-icons navigate_next
+			.bread-crumb
+				a(href="/courses/Science") 101
+		#content
