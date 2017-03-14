@@ -15,7 +15,7 @@ router.get('/courses', function(req, res, next) {
 	var client = new Client(config);
 	client.connect();
 
-	client.query('SELECT f.name AS fac_name, d.name AS dept_name, c.* ' +
+	client.query('SELECT f.name AS fac_name, d.name AS dept_name, d.full_name AS dept_full_name, c.* ' +
 		'FROM public.faculty AS f, public.department AS d, public.course as c ' +
 		'WHERE ' +
 		'EXISTS (SELECT * ' +

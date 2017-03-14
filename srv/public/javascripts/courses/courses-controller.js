@@ -42,7 +42,7 @@ function loadTree() {
 			var deptartment = faculty[deptName];
 
 			var deptNode = facultyNode.addChild({
-				text: deptName,
+				text: getDepartmentFullName(deptName),
 				link: facultyNode.link + deptName + "/"
 			});
 
@@ -113,7 +113,7 @@ function resetBreadcrumbs(faculty, dept, level) {
 		crumb($crumbs, faculty, link, !dept);
 		if (dept) {
 			link += "/" + dept;
-			crumb($crumbs, dept, link, !level);
+			crumb($crumbs, getDepartmentFullName(dept), link, !level);
 			if (level) {
 				if (level % 100 == 0) {
 					link += "/" + level;
@@ -192,12 +192,29 @@ function displayFaculty(name, faculty) {
 	$content.append($faculty);
 }
 
+function getDepartmentFullName(name) {
+	for(var facultyName in courseData) {
+		if(!courseData.hasOwnProperty(facultyName)) continue;
+
+		var faculty = courseData[facultyName];
+		if(faculty[name]) {
+			var dept = faculty[name];
+			for(var levelNum in dept) {
+				if(!dept.hasOwnProperty(levelNum)) continue;
+
+				var level = dept[levelNum];
+				return level[0].dept_full_name;
+			}
+		}
+	}
+}
+
 function displayDepartment(name, department, $parent) {
 	if(!department) return displayError("department");
 	$parent = $parent ? $parent : $content;
 
 	var $dept = $("<div>", { class: "nested" });
-	$dept.append($("<h2>", { text: name }));
+	$dept.append($("<h2>", { text: getDepartmentFullName(name) }));
 
 	for(var levelNum in department) {
 		if (!department.hasOwnProperty(levelNum)) continue;

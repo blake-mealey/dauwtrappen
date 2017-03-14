@@ -60,7 +60,8 @@ new pg.Pool(config).connect(function (err, c) {
 
 	query("DROP TABLE IF EXISTS department CASCADE");
 	query("CREATE TABLE department(" +
-		"name CHAR(4) PRIMARY KEY" +
+		"name CHAR(4) PRIMARY KEY," +
+		"full_name text" +
 		")");
 
 	query("DROP TABLE IF EXISTS degree CASCADE");
@@ -163,7 +164,7 @@ new pg.Pool(config).connect(function (err, c) {
 		"'Science')");
 
 	query("INSERT INTO department VALUES(" +
-		"'CPSC')");
+		"'CPSC', 'Computer Science')");
 
 	query("INSERT INTO faculty_contains VALUES(" +
 		"'Science', 'CPSC')");
