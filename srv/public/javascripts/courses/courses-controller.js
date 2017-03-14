@@ -115,8 +115,17 @@ function resetBreadcrumbs(faculty, dept, level) {
 			link += "/" + dept;
 			crumb($crumbs, dept, link, !level);
 			if (level) {
-				link += "/" + level;
-				crumb($crumbs, level, link, true);
+				if (level % 100 == 0) {
+					link += "/" + level;
+					crumb($crumbs, level, link, true);
+				} else {
+					var levelGroup = Math.floor(level/100)*100;
+					var link2 = link + "/" + levelGroup;
+					crumb($crumbs, levelGroup, link2, false);
+
+					link += "/" + level;
+					crumb($crumbs, level, link, true);
+				}
 			}
 		}
 	}
