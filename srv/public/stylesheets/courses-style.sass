@@ -1,20 +1,9 @@
 @import "colors"
 @import "shadows"
+@import "transitions"
 
-.ui-layout-pane
-  border: 0
-  background-color: $background-color
 .ui-layout-center
   padding: 0
-.ui-layout-north
-  background-color: $primary-color
-  color: $primary-color-text
-.ui-layout-west
-  background-color: $card-background-color
-.ui-layout-resizer-north
-  visibility: hidden
-.ui-layout-resizer-open-hover
-  background: $accent-color
 
 #search-box
   width: 100%
@@ -22,6 +11,9 @@
 
 $bread-crumbs-height: 40px
 #bread-crumbs
+  position: absolute
+  top: 0
+  left: 0
   width: 100%
   height: $bread-crumbs-height
   background-color: $bread-crumbs-color
@@ -33,21 +25,21 @@ $bread-crumbs-height: 40px
     display: inline-block
     line-height: $bread-crumbs-height
     padding: 0 10px 0 10px
-    opacity: 0.7
-    -webkit-transition: opacity .3s ease-in-out
-    -moz-transition: opacity .3s ease-in-out
-    -o-transition: opacity .3s ease-in-out
-    transition: opacity .3s ease-in-out
+    opacity: 0.7    // Not redundant!
     a
+      opacity: 0.7
       color: $primary-color-text
       text-decoration: none
       font-size: 24px
-  .current-crumb
+  .current-crumb a
     opacity: 0.9
-  .bread-crumb-tag:hover
+  .bread-crumb-tag
+    opacity: 1
+  .bread-crumb-tag a:hover
     opacity: 1
 
 #content
+  margin-top: $bread-crumbs-height
   padding: 10px
   .nested
     padding: 0 1em 0 1em
@@ -57,3 +49,7 @@ $bread-crumbs-height: 40px
     margin-bottom: 1em
     border-radius: 2px
     +card-shadow
+
+.header-link
+  color: #000000
+  margin-left: 20px

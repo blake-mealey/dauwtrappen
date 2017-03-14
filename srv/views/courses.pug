@@ -1,34 +1,20 @@
 extends layout
 
 block head
-	link(rel='stylesheet', href='/stylesheets/layout-default-latest.css')
 	link(rel='stylesheet', href='/stylesheets/courses-style.css')
 	link(rel='stylesheet', href='/stylesheets/inspire-tree.css')
-
-	script(type="text/javascript" src='/javascripts/courses/jquery-2.1.1.js')
-	script(type="text/javascript" src='/javascripts/courses/jquery-ui-1.11.0.js')
-	script(type="text/javascript" src='/javascripts/courses/jquery.layout.min.js')
 
 	script(type="text/javascript" src='/javascripts/courses/inspire-tree-bundled.min.js')
 	script(type="text/javascript" src='/javascripts/courses/courses-controller.js')
 
-block content
-	.ui-layout-north
-		h2= title
+block body
 	.ui-layout-west
 		form(action="#")
 			.mdl-textfield.mdl-js-textfield#search-box
 				input.mdl-textfield__input#search-box-input(type="text")
 				label.mdl-textfield__label(for="search-box-input") Search...
 		#courses-list
-	.ui-layout-center
-		#bread-crumbs
-			.bread-crumb
-				a(href="/courses/Science") Science
-			.bread-crumb.material-icons navigate_next
-			.bread-crumb
-				a(href="/courses/Science") CPSC
-			.bread-crumb.material-icons navigate_next
-			.bread-crumb
-				a(href="/courses/Science") 101
-		#content
+
+block center
+	#bread-crumbs
+	#content

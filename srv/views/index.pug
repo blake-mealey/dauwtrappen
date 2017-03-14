@@ -1,5 +1,11 @@
 extends layout
 
-block content
-	h1= title
-	p Welcome to #{title}
+block center
+	h5 Welcome to #{title}
+	ul
+		li
+			a(href="/login") Log in
+		li
+			a(href="/courses") View courses
+		li
+			a(href="/schedule") Build schedules
