@@ -16,14 +16,16 @@ html
 		script(type="text/javascript" src='/javascripts/jquery/jquery-2.1.1.js')
 		script(type="text/javascript" src='/javascripts/jquery/jquery-ui-1.11.0.js')
 		script(type="text/javascript" src='/javascripts/jquery/jquery.layout.min.js')
+
+		// Page setup
 		script(type="text/javascript" src='/javascripts/setup-layout.js')
+		script(type="text/javascript" src='/javascripts/nav-control.js')
 
 		// Per page header
 		block head
 	body
 		.ui-layout-north
-			h2= title
-			block north
+			include includes/head
 		.ui-layout-center
 			block center
 		block body

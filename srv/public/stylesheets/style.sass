@@ -1,6 +1,16 @@
 @import "colors"
 @import "transitions"
 
+#header
+  h2
+    display: inline-block
+  #primary-nav
+    display: inline-block
+    vertical-align: top
+    float: right
+    button
+      color: #FFFFFF
+
 body
   padding: 0
   background-color: $background-color
@@ -13,8 +23,10 @@ body
   color: $primary-color-text
 .ui-layout-west
   background-color: $card-background-color
-.ui-layout-resizer-open-hover
-  background: $accent-color
+.ui-layout-resizer-hover
+  background-color: $accent-color
+.ui-layout-toggler-hover
+  background-color: $primary-color
 
 a
   +transition(opacity, .3s, ease-in-out)
