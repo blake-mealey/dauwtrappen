@@ -9,13 +9,6 @@ $(document).ready(function () {
 	});
 });
 
-function allNodesToList(list, parent) {
-	parent.each(function(node) {
-		list.push(node);
-		allNodesToList(list, node.getChildren());
-	});
-}
-
 function setupSearch() {
 	$("#search-box-input").on("input", function() {
 		var filter = $(this).val();
@@ -23,8 +16,6 @@ function setupSearch() {
 		// correctly matched by our search
 		filter = filter.replace(/([^0-9])([0-9])/g, '$1 $2');
 		console.log(filter);
-
-
 
 		if(filter == "") {
 			tree.clearSearch();
@@ -36,17 +27,9 @@ function setupSearch() {
 				var resultVal = Math.max(result[1], result2[1]);
 				if(resultVal > 0) {
 					console.log(node.getTextualHierarchy().join(" ") + ": " + resultVal);
-					// node.expandParents();
-					// node.expand();
 				}
 				return resultVal > 0;
 			});
-			// tree.collapseDeep();
-			// var nodes = [];
-			// allNodesToList(nodes, tree);
-			// for (var i = 0; i < nodes.length; i++) {
-			// 	var node = nodes[i];
-			// }
 		}
 	});
 }
