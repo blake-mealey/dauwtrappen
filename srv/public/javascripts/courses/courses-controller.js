@@ -129,7 +129,7 @@ function resetBreadcrumbs(faculty, dept, level) {
 		crumb($crumbs, faculty, link, !dept);
 		if (dept) {
 			link += "/" + dept;
-			crumb($crumbs, getDepartmentFullName(dept), link, !level);
+			crumb($crumbs, dept, link, !level);
 			if (level) {
 				if (level % 100 == 0) {
 					link += "/" + level;
