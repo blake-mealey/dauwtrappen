@@ -5,8 +5,51 @@ $(document).ready(function () {
 
 		reloadContent();		// TODO: Which of these should go first? Can we do them at the same time?
 		loadTree();
+		setupSearch();
 	});
 });
+
+function allNodesToList(list, parent) {
+	parent.each(function(node) {
+		list.push(node);
+		allNodesToList(list, node.getChildren());
+	});
+}
+
+function setupSearch() {
+	$("#search-box-input").on("input", function() {
+		var filter = $(this).val();
+		// Puts a space between a letter followed by a number so 'cpsc101' goes to 'cpsc 101' which is
+		// correctly matched by our search
+		filter = filter.replace(/([^0-9])([0-9])/g, '$1 $2');
+		console.log(filter);
+
+
+
+		if(filter == "") {
+			tree.clearSearch();
+			tree.expandDeep();
+		} else {
+			tree.search(function(node) {
+				var result = fuzzy_match(node.text, filter);
+				var result2 = fuzzy_match(node.getTextualHierarchy().join(" "), filter);
+				var resultVal = Math.max(result[1], result2[1]);
+				if(resultVal > 0) {
+					console.log(node.getTextualHierarchy().join(" ") + ": " + resultVal);
+					// node.expandParents();
+					// node.expand();
+				}
+				return resultVal > 0;
+			});
+			// tree.collapseDeep();
+			// var nodes = [];
+			// allNodesToList(nodes, tree);
+			// for (var i = 0; i < nodes.length; i++) {
+			// 	var node = nodes[i];
+			// }
+		}
+	});
+}
 
 var courseData;
 var tree;
@@ -56,7 +99,9 @@ function loadTree() {
 		}
 	}
 
-	tree.expandDeep();
+	tree.on("model.loaded", function() {
+		tree.expandDeep();
+	});
 
 	tree.on("node.selected", function(node) {
 		history.pushState(null, null, "/courses/" + node.link);
@@ -81,7 +126,7 @@ function crumb($crumbs, text, link, last) {
 	$crumbs.append($crumb);
 
 	if(!last) {
-		$next = $("<div>", {
+		var $next = $("<div>", {
 			class: "bread-crumb material-icons",
 			text: "navigate_next"
 		});
@@ -150,8 +195,6 @@ function reloadContent() {
 					} catch (e) { displayError("level", e); }
 				}
 			} else {
-				console.log(faculty);
-				console.log(dept);
 				try {
 					displayDepartment(dept, courseData[faculty][dept], null, faculty);
 				} catch (e) { displayError("department", e); }
@@ -241,19 +284,19 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 	appendLink($h, "/courses/" + facultyName + "/" + deptName + "/" + num);
 	$level.append($h);
 
+	var $courses = $("<div>", { class: "nested" });
 	for (var i = 0; i < level.length; i++) {
 		var course = level[i];
-		displayCourse(course, $level);
+		displayCourse(course, $courses);
 	}
+	$level.append($courses);
 	$parent.append($level);
 }
 
 function getCourse(facultyName, deptName, number) {
 	var dept = courseData[facultyName][deptName][Math.floor(number/100)*100];
-	console.log(number);
 	for (var i = 0; i < dept.length; i++) {
 		var course = dept[i];
-		console.log(course);
 		if(course.number == number) {
 			return course;
 		}
