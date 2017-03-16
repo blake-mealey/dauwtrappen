@@ -85,7 +85,7 @@ new pg.Pool(config).connect(function (err, c) {
 	query("CREATE TABLE course(" +
 		"name text," +
 		"description text," +
-		"number smallint," +
+		"number text," +
 		"dept_name CHAR(4) NOT NULL," +
 		"FOREIGN KEY (dept_name) REFERENCES department(name) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"PRIMARY KEY (dept_name, number)" +
@@ -104,7 +104,7 @@ new pg.Pool(config).connect(function (err, c) {
 		"id int PRIMARY KEY," +
 		"ta_name text DEFAULT 'Staff'," +
 		"instr_name text DEFAULT 'Staff'," +
-		"course_num smallint NOT NULL," +
+		"course_num text NOT NULL," +
 		"deptName CHAR(4) NOT NULL," +
 		"FOREIGN KEY (ta_name) REFERENCES teaching_assistant(name) ON DELETE SET DEFAULT ON UPDATE CASCADE," +
 		"FOREIGN KEY (instr_name) REFERENCES instructor(name) ON DELETE SET DEFAULT ON UPDATE CASCADE," +
@@ -130,7 +130,7 @@ new pg.Pool(config).connect(function (err, c) {
 	query("DROP TABLE IF EXISTS degree_require CASCADE");
 	query("CREATE TABLE degree_require(" +
 		"degree_name text NOT NULL," +
-		"course_num smallint NOT NULL," +
+		"course_num text NOT NULL," +
 		"dept_name CHAR(4) NOT NULL," +
 		"gpa double precision," +       // TODO: Default?
 		"FOREIGN KEY (degree_name) REFERENCES degree(name) ON DELETE CASCADE ON UPDATE CASCADE," +

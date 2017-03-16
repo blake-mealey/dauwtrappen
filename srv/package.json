@@ -14,6 +14,7 @@
     "node-sass-middleware": "0.9.8",
     "pg": "^6.1.4",
     "pug": "~2.0.0-beta10",
-    "serve-favicon": "~2.3.2"
+    "serve-favicon": "~2.3.2",
+    "xml2js": "^0.4.17"
   }
 }
