@@ -19,7 +19,7 @@ function setupSearch() {
 
 		if(filter == "") {
 			tree.clearSearch();
-			tree.expandDeep();
+			tree.expand();
 		} else {
 			tree.search(function(node) {
 				var result = fuzzy_match(node.text, filter);
@@ -83,7 +83,7 @@ function loadTree() {
 	}
 
 	tree.on("model.loaded", function() {
-		tree.expandDeep();
+		tree.expand();
 	});
 
 	tree.on("node.selected", function(node) {
