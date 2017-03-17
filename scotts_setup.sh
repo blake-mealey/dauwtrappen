@@ -1,8 +1,16 @@
+sudo npm install -g expressjs
+sudo npm install -g express-generator
+
+echo "You shouldn't need this, this is what blake did for setting it up initally."
+
+exit
+
 #Install expressjs
 sudo npm install -g expressjs
 sudo npm install -g express-generator
-sudo npm install -g pg
-sudo npm install -g bcrypt
+
+#sudo npm install -g pg
+#sudo npm install -g bcrypt
 
 #Setup expressjs
 
@@ -29,5 +37,5 @@ npm start
 
 
 #Create a database: ddn_db
-createdb -U postgres ddn_db #OR use pgAdmin III
+#createdb -U postgres ddn_db #OR use pgAdmin III
 
