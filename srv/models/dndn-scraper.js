@@ -26,10 +26,15 @@ function scrapeSemesters() {
 			for(var termName in data) {
 				if(!data.hasOwnProperty(termName)) continue;
 				var term = data[termName].$;
-				if(term.desc == "Fall 2017") {
-					scrapeSemester(term.name);
+				if(term.desc == "Summer 2016") {
+					break;
 				}
 			}
+
+			semesterId = term.name;
+			saveSemester(term, function () {
+				scrapeSemester(term.name);
+			});
 		});
 	});
 }
@@ -61,9 +66,63 @@ function setupSave(cb) {
 
 		client.query("INSERT INTO faculty VALUES('Dump')", function(err, result) {
 			if(err) return console.log(err);
+
 			client.end();
 			if(cb) cb();
 		});
+	});
+}
+
+function saveSemester(semester, cb) {
+	if(!semester) return;
+
+	var client = new Client(config);
+	client.connect();
+
+	client.query("INSERT INTO semester VALUES(" + semester.name + ",'" + semester.desc + "') ON CONFLICT DO NOTHING", function (err, result) {
+		if(err) return console.log(err);
+
+		client.end();
+		if(cb) cb();
+	});
+}
+
+function saveDepartment(client, dept, cb) {
+	client.query("INSERT INTO department VALUES('" + dept + "','" + dept + "') ON CONFLICT DO NOTHING", function (err, result) {
+		if(err) return console.log(err);
+		client.query("INSERT INTO faculty_contains VALUES('Dump','" + dept + "') ON CONFLICT DO NOTHING", function (err, result) {
+			if(err) return console.log(err);
+			cb();
+		});
+	});
+}
+
+function saveInstructor(client, name, cb) {
+	client.query("INSERT INTO instructor VALUES('" + name + "') ON CONFLICT DO NOTHING", function (err, result) {
+		if(err) return console.log(err);
+		cb();
+	});
+}
+
+var semesterId;
+var sectionId = 0;
+function saveSection(client, dept, courseNum, section, cb) {
+	var q = "INSERT INTO course_section VALUES(" +
+		"'" + ((section.$.type == "Lecture") ? "LEC" : (section.$.type == "Lab") ? "LAB" : "TUT") + "', " +
+		semesterId + ", " +
+		section.$.group + ", " +
+		(section.time ? ("'" + section.time[0].$.day + section.time[0].$.time + "'") : "NULL") + ", " +
+		"'" + section.room[0] + "', " +
+		sectionId++ + ", " +
+		"NULL, " +
+		"'" + section.instructor + "', " +
+		"'" + courseNum + "', " +
+		"'" + dept + "'" +
+		") ON CONFLICT DO NOTHING";
+	// console.log(q);
+	client.query(q, function (err, result) {
+		if(err) return console.log(err);
+		cb();
 	});
 }
 
@@ -73,31 +132,31 @@ function saveCourse(course, cb) {
 	var client = new Client(config);
 	client.connect();
 
-	var dept = course.$.subject;
 	var num = course.$.number;
 	var name = course.description[0].replace(/'/g, '"');
-	client.query("SELECT * FROM department WHERE name='" + dept + "'", function(err, result) {
-		if(err) return console.log(err);
+	var dept = course.$.subject;
+	saveDepartment(client, dept, function () {
+		client.query("INSERT INTO course VALUES('" + name + "','" + name + "','" + num + "','" + dept + "') ON CONFLICT DO NOTHING", function (err, result) {
+			if(err) return console.log(err);
 
-		function insertCourse() {
-			client.query("INSERT INTO course VALUES('" + name + "','" + name + "','" + num + "','" + dept + "')", function (err, result) {
-				if(err) return console.log(err);
-				client.end();
-				if(cb) cb();
-			})
-		}
+			var sections = course.periodic;
+			var index = 0;
+			function each() {
+				var section = sections[index++];
+				if(!section){
+					client.end();
+					if(cb) cb();
+					return;
+				}
 
-		if(result.rows.length == 0) {
-			client.query("INSERT INTO department VALUES('" + dept + "','" + dept + "')", function (err, result) {
-				if(err) return console.log(err);
-				client.query("INSERT INTO faculty_contains VALUES('Dump','" + dept + "')", function (err, result) {
-					if(err) return console.log(err);
-					insertCourse();
+				section.instructor = section.instructor[0].replace(/'/g, '"');
+				// console.log(section);
+				saveInstructor(client, section.instructor, function() {
+					saveSection(client, dept, num, section, each);
 				});
-			});
-		} else {
-			insertCourse();
-		}
+			}
+			each();
+		});
 	});
 }
 

@@ -11,7 +11,7 @@ var config = {
 var client;
 
 var endCount = 0;
-var queryCount = 26;
+var queryCount = 27;
 
 function end(force) {
 	if(++endCount >= queryCount || force) {
@@ -37,6 +37,9 @@ new pg.Pool(config).connect(function (err, c) {
 	client = c;
 
 	// INSERT TEST DATA
+
+	query("INSERT INTO semester VALUES(" +
+		"1234, 'Fall 2017')");
 
 	query("INSERT INTO user_account VALUES(" +
 		"'blakemealey@gmail.com', 'pass')");
@@ -108,10 +111,10 @@ new pg.Pool(config).connect(function (err, c) {
 		"'Syed Zain Raza Rizvi')");
 
 	query("INSERT INTO course_section VALUES(" +
-		"'LAB', 1, 'Fr 9:00AM-11:50AM,Fr 1:00PM-3:50PM', 'ST 135', 0, 70349, 'Syed Zain Raza Rizvi', NULL, 101, 'CPSC')");
+		"'LAB', 1234, 1, 'Fr 9:00AM-11:50AM,Fr 1:00PM-3:50PM', 'ST 135', 70349, 'Syed Zain Raza Rizvi', NULL, 101, 'CPSC')");
 
 	query("INSERT INTO course_section VALUES(" +
-		"'LAB', 1, 'WeTh 9:00AM-11:50AM,WeTh 1:00PM-3:50PM', 'ST 139', 0, 70350, 'Syed Zain Raza Rizvi', NULL, 102, 'CPSC')");
+		"'LAB', 1234, 1, 'WeTh 9:00AM-11:50AM,WeTh 1:00PM-3:50PM', 'ST 139', 70350, 'Syed Zain Raza Rizvi', NULL, 102, 'CPSC')");
 
 	query("INSERT INTO schedule VALUES(" +
 		"'109156be-c4fb-41ea-b1b4-efe1671c5836', 'My Schedule', 'testing 1, 2, 3...', 'blakemealey@gmail.com')");

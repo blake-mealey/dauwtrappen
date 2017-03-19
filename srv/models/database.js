@@ -11,7 +11,7 @@ var config = {
 var client;
 
 var endCount = 0;
-var queryCount = 15*2;
+var queryCount = 16*2;
 
 function end(force) {
 	if(++endCount >= queryCount || force) {
@@ -51,6 +51,12 @@ new pg.Pool(config).connect(function (err, c) {
 		"description text," +
 		"owner_email text NOT NULL," +
 		"FOREIGN KEY (owner_email) REFERENCES user_account(email) ON DELETE CASCADE ON UPDATE CASCADE" +
+		")");
+
+	query("DROP TABLE IF EXISTS semester CASCADE");
+	query("CREATE TABLE semester(" +
+		"id int PRIMARY KEY," +
+		"name text" +	// TODO: start and end dates (?)
 		")");
 
 	query("DROP TABLE IF EXISTS faculty CASCADE");
@@ -97,18 +103,19 @@ new pg.Pool(config).connect(function (err, c) {
 	query("DROP TABLE IF EXISTS course_section CASCADE");
 	query("CREATE TABLE course_section(" +
 		"type section_type," +
+		"semester_id int," +
 		"number smallint," +
 		"time text," +      // TODO: Determine type
 		"location text," +
-		"semester int," +
 		"id int PRIMARY KEY," +
 		"ta_name text DEFAULT 'Staff'," +
 		"instr_name text DEFAULT 'Staff'," +
 		"course_num text NOT NULL," +
-		"deptName CHAR(4) NOT NULL," +
+		"dept_name CHAR(4) NOT NULL," +
+		"FOREIGN KEY (semester_id) REFERENCES semester(id) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"FOREIGN KEY (ta_name) REFERENCES teaching_assistant(name) ON DELETE SET DEFAULT ON UPDATE CASCADE," +
 		"FOREIGN KEY (instr_name) REFERENCES instructor(name) ON DELETE SET DEFAULT ON UPDATE CASCADE," +
-		"FOREIGN KEY (deptName, course_num) REFERENCES course(dept_name, number) ON DELETE CASCADE ON UPDATE CASCADE" +
+		"FOREIGN KEY (dept_name, course_num) REFERENCES course(dept_name, number) ON DELETE CASCADE ON UPDATE CASCADE" +
 		")");
 
 	query("DROP TABLE IF EXISTS works_for CASCADE");
