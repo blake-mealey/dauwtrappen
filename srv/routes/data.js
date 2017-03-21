@@ -22,44 +22,33 @@ router.get('/semesters', function(req, res) {
 	var client = new Client(config);
 	client.connect();
 
-	var q = escape("SELECT * FROM semester");
+	var q = escape("SELECT s.*, f.name as fac_name FROM faculty as f, faculty_contains as fc, course_section as c, semester as s WHERE " +
+		"c.semester_id=s.id AND c.dept_name=fc.dept_name AND f.name=fc.faculty_name GROUP BY s.id, f.name");
+	console.log(q);
 	client.query(q, function(err, result) {
 		client.end();
 		if(err) {
+			console.log(err);
 			res.send(error("Database error."));
 			return;
 		}
 
-		res.send(result.rows);
-	});
-});
-
-router.get('/faculties', function(req, res) {
-	if(!req.query.semesterId) {
-		res.send("No semester ID");
-		return;
-	}
-
-	var client = new Client(config);
-	client.connect();
-
-	var q = escape("SELECT f.* FROM faculty as f WHERE EXISTS (" +
-		"SELECT 1 FROM faculty_contains as fc, course_section as c WHERE " +
-		"c.semester_id=%s AND " +
-		"c.dept_name=fc.dept_name AND " +
-		"f.name=fc.faculty_name)", req.query.semesterId);
-	console.log(q);
-	client.query(q, function(err, result) {
-
-		client.end();
-		if(err) {
-			console.log(err);
-			res.send("Database error.");
-			return;
+		var semesters = {};
+		for (var i = 0; i < result.rows.length; i++) {
+			var obj = result.rows[i];
+			if(!semesters[obj.id]) {
+				semesters[obj.id] = {
+					id: obj.id,
+					name: obj.name,
+					faculties: []
+				};
+			}
+			semesters[obj.id].faculties.push(obj.fac_name);
+			semesters[obj.id].faculties.sort();
 		}
 
-		res.send(result.rows);
-	})
+		res.send(semesters);
+	});
 });
 
 router.get('/courses', function(req, res) {
@@ -76,14 +65,12 @@ router.get('/courses', function(req, res) {
 	var client = new Client(config);
 	client.connect();
 
-	var q = escape("SELECT c.* FROM course as c, faculty_contains as fc, course_section as s WHERE " +
-		"s.semester_id=%s AND " +
-		"s.dept_name=fc.dept_name AND " +
-		"c.number=s.course_num AND " +
-		"c.dept_name=s.dept_name AND " +
-		"fc.faculty_name=%L", req.query.semesterId, req.query.facultyName);
+	var q = escape("SELECT DISTINCT c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+		"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
+		"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
+		"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
+		req.query.semesterId, req.query.facultyName);
 	client.query(q, function (err, result) {
-
 		client.end();
 		if(err) {
 			console.log(err);
@@ -96,13 +83,10 @@ router.get('/courses', function(req, res) {
 			var obj = result.rows[i];
 			var parent = courseData;
 
-			// if(!courseData[obj.fac_name]) courseData[obj.fac_name] = {};
-			// parent = courseData[obj.fac_name];
-
 			if(!parent[obj.dept_name]) parent[obj.dept_name] = {};
 			parent = parent[obj.dept_name];
 
-			var level = Math.floor(obj.number/100) * 100;
+			var level = Math.floor(Number(obj.number.substr(0,3))/100) * 100;
 			if(!parent[level]) parent[level] = [];
 			parent = parent[level];
 
@@ -112,47 +96,5 @@ router.get('/courses', function(req, res) {
 		res.send(courseData);
 	});
 });
-
-/*
-router.get('/courses', function(req, res, next) {
-	var client = new Client(config);
-	client.connect();
-
-	client.query('SELECT f.name AS fac_name, d.name AS dept_name, d.full_name AS dept_full_name, c.* ' +
-		'FROM public.faculty AS f, public.department AS d, public.course as c ' +
-		'WHERE ' +
-		'EXISTS (SELECT * ' +
-		'FROM public.faculty_contains ' +
-		'WHERE faculty_name=f.name AND dept_name=d.name) ' +
-		'AND c.dept_name=d.name', function (err, result) {
-
-		client.end();
-		if(err) {
-			res.send(error("Database error."));
-			return;
-		}
-
-		var courseData = {};
-		for (var i = 0; i < result.rows.length; i++) {
-			var obj = result.rows[i];
-			var parent = courseData;
-
-			if(!courseData[obj.fac_name]) courseData[obj.fac_name] = {};
-			parent = courseData[obj.fac_name];
-
-			if(!parent[obj.dept_name]) parent[obj.dept_name] = {};
-			parent = parent[obj.dept_name];
-
-			var level = Math.floor(obj.number/100) * 100;
-			if(!parent[level]) parent[level] = [];
-			parent = parent[level];
-
-			parent.push(obj);
-		}
-
-		res.send(courseData);
-	});
-});
-*/
 
 module.exports = router;

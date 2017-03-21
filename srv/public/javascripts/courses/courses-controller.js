@@ -38,7 +38,6 @@ function resetBreadcrumbs(faculty, dept, level) {
 	var $crumbs = $("#bread-crumbs");
 	$crumbs.empty();
 
-	// TODO: replace link click with history.pushState
 	var link = "/courses";
 	crumb($crumbs, "Home", link, !faculty);
 	if (faculty) {
@@ -52,7 +51,7 @@ function resetBreadcrumbs(faculty, dept, level) {
 					link += "/" + level;
 					crumb($crumbs, level, link, true);
 				} else {
-					var levelGroup = Math.floor(level/100)*100;
+					var levelGroup = getLevelNum(level);
 					var link2 = link + "/" + levelGroup;
 					crumb($crumbs, levelGroup, link2, false);
 
@@ -194,7 +193,7 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 }
 
 function getCourse(facultyName, deptName, number) {
-	var dept = courseData[facultyName][deptName][Math.floor(number/100)*100];
+	var dept = courseData[facultyName][deptName][getLevelNum(number)];
 	for (var i = 0; i < dept.length; i++) {
 		var course = dept[i];
 		if(course.number == number) {
@@ -223,4 +222,8 @@ function displayError(type, e) {
 	if(e) console.log(e);
 	$content.append($("<h4>", { text: "No such " + type + " exists 😞. Make sure your URL is correct." }));
 	return false;
+}
+
+function getLevelNum(courseNum) {
+	return Math.floor(courseNum.substr(0, 3)/100)*100
 }

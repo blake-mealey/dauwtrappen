@@ -66,14 +66,14 @@ new pg.Pool(config).connect(function (err, c) {
 
 	query("DROP TABLE IF EXISTS department CASCADE");
 	query("CREATE TABLE department(" +
-		"name CHAR(4) PRIMARY KEY," +
+		"name VARCHAR(4) PRIMARY KEY," +
 		"full_name text" +
 		")");
 
 	query("DROP TABLE IF EXISTS degree CASCADE");
 	query("CREATE TABLE degree(" +
 		"name text PRIMARY KEY," +
-		"dept_name CHAR(4) NOT NULL," +
+		"dept_name VARCHAR(4) NOT NULL," +
 		"FOREIGN KEY (dept_name) REFERENCES department(name) ON DELETE CASCADE ON UPDATE CASCADE" +
 		")");
 
@@ -92,7 +92,7 @@ new pg.Pool(config).connect(function (err, c) {
 		"name text," +
 		"description text," +
 		"number text," +
-		"dept_name CHAR(4) NOT NULL," +
+		"dept_name VARCHAR(4) NOT NULL," +
 		"FOREIGN KEY (dept_name) REFERENCES department(name) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"PRIMARY KEY (dept_name, number)" +
 		")");
@@ -111,7 +111,7 @@ new pg.Pool(config).connect(function (err, c) {
 		"ta_name text DEFAULT 'Staff'," +
 		"instr_name text DEFAULT 'Staff'," +
 		"course_num text NOT NULL," +
-		"dept_name CHAR(4) NOT NULL," +
+		"dept_name VARCHAR(4) NOT NULL," +
 		"FOREIGN KEY (semester_id) REFERENCES semester(id) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"FOREIGN KEY (ta_name) REFERENCES teaching_assistant(name) ON DELETE SET DEFAULT ON UPDATE CASCADE," +
 		"FOREIGN KEY (instr_name) REFERENCES instructor(name) ON DELETE SET DEFAULT ON UPDATE CASCADE," +
@@ -121,7 +121,7 @@ new pg.Pool(config).connect(function (err, c) {
 	query("DROP TABLE IF EXISTS works_for CASCADE");
 	query("CREATE TABLE works_for(" +
 		"inst_name text NOT NULL," +
-		"dept_name CHAR(4) NOT NULL," +
+		"dept_name VARCHAR(4) NOT NULL," +
 		"FOREIGN KEY (inst_name) REFERENCES instructor(name) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"FOREIGN KEY (dept_name) REFERENCES department(name) ON DELETE CASCADE ON UPDATE CASCADE" +
 		")");
@@ -129,7 +129,7 @@ new pg.Pool(config).connect(function (err, c) {
 	query("DROP TABLE IF EXISTS faculty_contains CASCADE");
 	query("CREATE TABLE faculty_contains(" +
 		"faculty_name text NOT NULL," +
-		"dept_name CHAR(4) NOT NULL," +
+		"dept_name VARCHAR(4) NOT NULL," +
 		"FOREIGN KEY (faculty_name) REFERENCES faculty(name) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"FOREIGN KEY (dept_name) REFERENCES department(name) ON DELETE CASCADE ON UPDATE CASCADE" +
 		")");
@@ -138,7 +138,7 @@ new pg.Pool(config).connect(function (err, c) {
 	query("CREATE TABLE degree_require(" +
 		"degree_name text NOT NULL," +
 		"course_num text NOT NULL," +
-		"dept_name CHAR(4) NOT NULL," +
+		"dept_name VARCHAR(4) NOT NULL," +
 		"gpa double precision," +       // TODO: Default?
 		"FOREIGN KEY (degree_name) REFERENCES degree(name) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"FOREIGN KEY (dept_name, course_num) REFERENCES course(dept_name, number) ON DELETE CASCADE ON UPDATE CASCADE" +
