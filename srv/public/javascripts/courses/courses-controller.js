@@ -116,22 +116,22 @@ function displayAll() {
 	}
 }
 
-function appendLink($obj, url) {
-	var $a = $("<a class='material-icons header-link' href=''>link</a>");
+function createLinkHeader($parent, tag, text, url) {
+	var $a = $("<a class='header-link' href=''>");
 	$a.click(function(e) {
 		e.preventDefault();
 		history.pushState(null, null, url);
 		reloadContent();
 	});
-	$obj.append($a);
+	var $h = $(tag, { text: text });
+	$a.append($h);
+	$parent.append($a);
 }
 
 function displayFaculty(name, faculty) {
 	if(!faculty) return displayError("faculty");
 	var $faculty = $("<div>", { class: "nested" });
-	var $h = $("<h1>", { text: name });
-	appendLink($h, "/courses/" + name);
-	$faculty.append($h);
+	createLinkHeader($faculty, "<h1>", name, "/courses/" + name);
 	for(var deptName in faculty) {
 		if (!faculty.hasOwnProperty(deptName)) continue;
 		var dept = faculty[deptName];
@@ -162,9 +162,7 @@ function displayDepartment(name, department, $parent, facultyName) {
 	$parent = $parent ? $parent : $content;
 
 	var $dept = $("<div>", { class: "nested" });
-	var $h = $("<h2>", { text: getDepartmentFullName(name) });
-	appendLink($h, "/courses/" + facultyName + "/" + name);
-	$dept.append($h);
+	createLinkHeader($dept, "<h2>", getDepartmentFullName(name), "/courses/" + facultyName + "/" + name);
 
 	for(var levelNum in department) {
 		if (!department.hasOwnProperty(levelNum)) continue;
@@ -179,9 +177,7 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 	$parent = $parent ? $parent : $content;
 
 	var $level = $("<div>", { class: "nested" });
-	var $h = $("<h3>", { text: num + " Level Courses" });
-	appendLink($h, "/courses/" + facultyName + "/" + deptName + "/" + num);
-	$level.append($h);
+	createLinkHeader($level, "<h3>", num + " Level Courses", "/courses/" + facultyName + "/" + deptName + "/" + num);
 
 	var $courses = $("<div>", { class: "nested" });
 	for (var i = 0; i < level.length; i++) {
@@ -210,10 +206,8 @@ function displayCourse(course, $parent) {
 		class: "course"
 	});
 
-	var $h = $("<h4>", {text: course.number + ": " + course.name});
-	appendLink($h, "/courses/" + course.fac_name + "/" + course.dept_name + "/" + course.number);
+	createLinkHeader($course, "<h4>", course.number + ": " + course.name, "/courses/" + course.fac_name + "/" + course.dept_name + "/" + course.number);
 
-	$course.append($h);
 	$course.append($("<p>", {text: course.description}));
 	$parent.append($course);
 }
