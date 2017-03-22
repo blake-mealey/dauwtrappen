@@ -62,7 +62,7 @@ function setupSave(cb) {
 	var client = new Client(config);
 	client.connect();
 
-	client.query("DELETE FROM faculty", function(err, result) {
+	client.query("DELETE FROM faculty", function(err) {
 		if(err) return console.log(err);
 
 		client.end();
@@ -78,7 +78,7 @@ function saveSemester(semester, cb) {
 
 	var q = escape("INSERT INTO semester VALUES(%s,%L) ON CONFLICT DO NOTHING", semester.name, semester.desc);
 	console.log(q);
-	client.query(q, function (err, result) {
+	client.query(q, function (err) {
 		if(err) return console.log(err);
 
 		client.end();
@@ -89,7 +89,7 @@ function saveSemester(semester, cb) {
 function saveFaculty(client, faculty, cb) {
 	var q = escape("INSERT INTO faculty VALUES(%L) ON CONFLICT DO NOTHING", faculty);
 	console.log(q);
-	client.query(q, function(err, result) {
+	client.query(q, function(err) {
 		if(err) return console.log(err);
 		cb();
 	});
@@ -100,11 +100,11 @@ function saveDepartment(client, dept, cb) {
 	saveFaculty(client, faculty, function() {
 		var q = escape("INSERT INTO department VALUES(%L,%L) ON CONFLICT DO NOTHING", dept, dept);
 		console.log(q);
-		client.query(q, function (err, result) {
+		client.query(q, function (err) {
 			if(err) return console.log(err);
 			q = escape("INSERT INTO faculty_contains VALUES(%L,%L) ON CONFLICT DO NOTHING", faculty, dept);
 			console.log(q);
-			client.query(q, function (err, result) {
+			client.query(q, function (err) {
 				if(err) return console.log(err);
 				cb();
 			});
@@ -115,7 +115,7 @@ function saveDepartment(client, dept, cb) {
 function saveInstructor(client, name, cb) {
 	var q = escape("INSERT INTO instructor VALUES(%L) ON CONFLICT DO NOTHING", name);
 	console.log(q);
-	client.query(q, function (err, result) {
+	client.query(q, function (err) {
 		if(err) return console.log(err);
 		cb();
 	});
@@ -129,7 +129,7 @@ function saveSection(client, dept, courseNum, section, cb) {
 	var q = escape("INSERT INTO course_section VALUES(%L,%s,%s,%s,%L,%s,NULL,%L,%L,%L) ON CONFLICT DO NOTHING",
 		type, semesterId, section.$.name, time, section.room[0], sectionId++, section.instructor, courseNum, dept);
 	console.log(q);
-	client.query(q, function (err, result) {
+	client.query(q, function (err) {
 		if(err) return console.log(err);
 		cb();
 	});
@@ -147,7 +147,7 @@ function saveCourse(course, cb) {
 	saveDepartment(client, dept, function () {
 		var q = escape("INSERT INTO course VALUES(%L,%L,%L,%L) ON CONFLICT DO NOTHING", name, name, num, dept);
 		console.log(q);
-		client.query(q, function (err, result) {
+		client.query(q, function (err) {
 			if(err) return console.log(err);
 
 			var sections = course.periodic;

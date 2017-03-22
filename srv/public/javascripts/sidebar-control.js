@@ -6,9 +6,9 @@ function setupSidebar(nodeSelectedCb, cb) {
 
 	tree = new InspireTree({
 		target: '#courses-list',
-		data: function(node, resolve, reject) {
+		data: function(node) {
 			if(node) {
-				return new Promise(function (resolve, reject) {
+				return new Promise(function (resolve) {
 					if(node.loadedData) {
 						resolve(node.loadedData);
 						node.loadedData = undefined;
@@ -22,10 +22,7 @@ function setupSidebar(nodeSelectedCb, cb) {
 			}
 		}
 	});
-	/*tree.on("model.loaded", function() {
-		tree.expand();
-	});*/
-	tree.on("node.selected", nodeSelectedCb);
+	if(nodeSelectedCb) tree.on("node.selected", nodeSelectedCb);
 
 	setupSearch();
 
@@ -38,7 +35,7 @@ function setupSidebar(nodeSelectedCb, cb) {
 			courseData[faculty] = {};
 		}
 		loadFacultiesInTree();
-		cb();
+		// cb();	// TODO: Improve course-controller efficiency in handling this...
 
 		var index = 0;
 		function nextFac() {
@@ -49,9 +46,11 @@ function setupSidebar(nodeSelectedCb, cb) {
 			}
 			$.get("/data/courses", { semesterId: semester.id, facultyName: fac }, function(data) {
 				if(!data) return;
+				console.log(data);
 				courseData[fac] = data;
 				loadFacultyData(fac);
-				cb();
+				tree.expand();
+				// cb();	// TODO: Improve course-controller efficiency in handling this...
 				nextFac();
 			});
 		}
@@ -59,12 +58,13 @@ function setupSidebar(nodeSelectedCb, cb) {
 	});
 }
 
-function setupSearch() {	// TODO: Remove fuzzy match
+function setupSearch() {
 	$("#search-box-input").on("input", function() {
-		var filter = $(this).val();
+		var filter = $(this).val().toLowerCase();
 		// Puts a space between a letter followed by a number so 'cpsc101' goes to 'cpsc 101' which is
 		// correctly matched by our search
 		filter = filter.replace(/([^0-9])([0-9])/g, '$1 $2');
+		var parts = filter.split(" ");
 		console.log(filter);
 
 		if(filter == "") {
@@ -72,13 +72,11 @@ function setupSearch() {	// TODO: Remove fuzzy match
 			tree.expand();
 		} else {
 			tree.search(function(node) {
-				var result = fuzzy_match(node.text, filter);
-				var result2 = fuzzy_match(node.getTextualHierarchy().join(" "), filter);
-				var resultVal = Math.max(result[1], result2[1]);
-				if(resultVal > 0) {
-					console.log(node.getTextualHierarchy().join(" ") + ": " + resultVal);
+				var text = node.text.toLowerCase();
+				if(text.includes(filter)) return true;
+				for (var i = parts.length - 1; i >= 0; i--) {
+					if(text.includes(parts[i])) return true;
 				}
-				return resultVal > 0;
 			});
 		}
 	});
@@ -125,7 +123,6 @@ function loadFacultyData(facultyName) {
 		for(var levelNum in deptartment) {
 			if(!deptartment.hasOwnProperty(levelNum)) continue;
 			var level = deptartment[levelNum];
-
 			var levelNode = {
 				text: levelNum,
 				link: deptNode.link + levelNum + "/",
@@ -133,8 +130,9 @@ function loadFacultyData(facultyName) {
 				children: []
 			};
 
-			for (var i = 0; i < level.length; i++) {
-				var course = level[i];
+			for(var courseNum in level) {
+				if(!level.hasOwnProperty(courseNum)) continue;
+				var course = level[courseNum];
 
 				levelNode.children.push({
 					text: course.number + ": " + course.name,
@@ -153,53 +151,6 @@ function loadFacultyData(facultyName) {
 	if(facultyNode.finished) facultyNode.finished();
 }
 
-function loadTree() {
-	for(var facultyName in courseData) {
-		if(!courseData.hasOwnProperty(facultyName)) continue;
-		var faculty = courseData[facultyName];
-
-		var facultyNode = tree.addNode({
-			text: facultyName,
-			link: facultyName + "/",
-			type: "faculty"
-		});
-
-		for(var deptName in faculty) {
-			if(!faculty.hasOwnProperty(deptName)) continue;
-			var deptartment = faculty[deptName];
-
-			var deptNode = facultyNode.addChild({
-				text: getDepartmentFullName(deptName),
-				link: facultyNode.link + deptName + "/",
-				type: "deptartment"
-			});
-
-			for(var levelNum in deptartment) {
-				if(!deptartment.hasOwnProperty(levelNum)) continue;
-				var level = deptartment[levelNum];
-
-				var levelNode = deptNode.addChild({
-					text: levelNum,
-					link: deptNode.link + levelNum + "/",
-					type: "level"
-				});
-
-				for (var i = 0; i < level.length; i++) {
-					var course = level[i];
-
-					levelNode.addChild({
-						text: course.number + ": " + course.name,
-						link: levelNode.link.substr(0, levelNode.link.lastIndexOf("/", levelNode.link.length - 2) + 1)
-						+ course.number + "/",
-						type: "course",
-						data: course
-					});
-				}
-			}
-		}
-	}
-}
-
 function getDepartmentFullName(name) {
 	for(var facultyName in courseData) {
 		if(!courseData.hasOwnProperty(facultyName)) continue;
@@ -209,9 +160,13 @@ function getDepartmentFullName(name) {
 			var dept = faculty[name];
 			for(var levelNum in dept) {
 				if(!dept.hasOwnProperty(levelNum)) continue;
-
 				var level = dept[levelNum];
-				return level[0].dept_full_name;
+
+				for(var courseNum in level) {
+					if (!level.hasOwnProperty(courseNum)) continue;
+
+					return level[courseNum].dept_full_name;
+				}
 			}
 		}
 	}

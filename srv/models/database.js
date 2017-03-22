@@ -20,7 +20,7 @@ function end(force) {
 }
 
 function query(str) {
-	client.query(str, function (err, res) {
+	client.query(str, function (err) {
 		if (err) {
 			console.log("Error executing query '" + str + "':");
 			console.log(err);

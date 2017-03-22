@@ -65,7 +65,7 @@ router.get('/courses', function(req, res) {
 	var client = new Client(config);
 	client.connect();
 
-	var q = escape("SELECT DISTINCT c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+	var q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
 		"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
 		"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
 		"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
@@ -86,11 +86,31 @@ router.get('/courses', function(req, res) {
 			if(!parent[obj.dept_name]) parent[obj.dept_name] = {};
 			parent = parent[obj.dept_name];
 
-			var level = Math.floor(Number(obj.number.substr(0,3))/100) * 100;
-			if(!parent[level]) parent[level] = [];
+			var level = Math.floor(Number(obj.course_num.substr(0,3))/100) * 100;
+			if(!parent[level]) parent[level] = {};
 			parent = parent[level];
 
-			parent.push(obj);
+			if(!parent[obj.course_num]) {
+				parent[obj.course_num] = {
+					dept_full_name: obj.dept_full_name,
+					dept_name: obj.dept_name,
+					description: obj.description,
+					fac_name: obj.fac_name,
+					name: obj.name,
+					number: obj.course_num,
+					sections: []
+				};
+			}
+			parent = parent[obj.number];
+
+			parent.sections.push({
+				section_number: obj.number,
+				type: obj.type,
+				time: obj.time,
+				location: obj.location,
+				section_id: obj.id,
+				instr_name: obj.ta_name || obj.instr_name
+			});
 		}
 
 		res.send(courseData);

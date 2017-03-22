@@ -140,23 +140,6 @@ function displayFaculty(name, faculty) {
 	$content.append($faculty);
 }
 
-function getDepartmentFullName(name) {
-	for(var facultyName in courseData) {
-		if(!courseData.hasOwnProperty(facultyName)) continue;
-
-		var faculty = courseData[facultyName];
-		if(faculty[name]) {
-			var dept = faculty[name];
-			for(var levelNum in dept) {
-				if(!dept.hasOwnProperty(levelNum)) continue;
-
-				var level = dept[levelNum];
-				return level[0].dept_full_name;
-			}
-		}
-	}
-}
-
 function displayDepartment(name, department, $parent, facultyName) {
 	if(!department) return displayError("department");
 	$parent = $parent ? $parent : $content;
@@ -180,8 +163,9 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 	createLinkHeader($level, "<h3>", num + " Level Courses", "/courses/" + facultyName + "/" + deptName + "/" + num);
 
 	var $courses = $("<div>", { class: "nested" });
-	for (var i = 0; i < level.length; i++) {
-		var course = level[i];
+	for(var courseNum in level) {
+		if(!level.hasOwnProperty(courseNum)) continue;
+		var course = level[courseNum];
 		displayCourse(course, $courses);
 	}
 	$level.append($courses);
