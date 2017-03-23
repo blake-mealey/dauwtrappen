@@ -1,6 +1,13 @@
+var lastUrl;
+var urlParts;
+var $content;
+
 $(document).ready(function () {
-	setupSidebar(nodeSelected, function() {
-		reloadContent();
+	$content = $("#content");
+
+	urlChanged();
+	setupSidebar(nodeSelected, function(faculty) {
+		loadContent(faculty);
 	});
 
 	window.onpopstate = history.onpushstate = reloadContent;
@@ -63,49 +70,60 @@ function resetBreadcrumbs(faculty, dept, level) {
 	}
 }
 
-var lastUrl;
-var $content;
-function reloadContent() {
+function urlChanged() {
+	// TODO: Use window.location.(something) instead. (Doesn't have http://url.com/)
 	var url = window.location.href;
 	if (lastUrl && url != lastUrl) return;
 	if(url.indexOf("#") > -1)
 		url = url.substr(0, url.indexOf("#"));
 	if(url.indexOf("?") > -1)
 		url = url.substr(0, url.indexOf("?"));
-	var parts = url.split("/");
+	urlParts = url.split("/");
 
-	$content = $("#content");
-	$content.empty();
+	resetBreadcrumbs(urlParts[4], urlParts[5], urlParts[6]);
+}
 
-	resetBreadcrumbs(parts[4], parts[5], parts[6]);
-	var faculty = parts[4];
-
+function loadContent(facultyName) {
+	var faculty = urlParts[4];
 	if(faculty && faculty.trim() != '') {
-		var dept = parts[5];
-
-		if(dept && dept.trim() != '') {
-			var level = parts[6];
-
-			if(level && level.trim() != '') {
-				if(level % 100 != 0) {
-					displayCourse(getCourse(faculty, dept, level));
+		if(!facultyName || faculty == facultyName) {
+			var dept = urlParts[5];
+			if (dept && dept.trim() != '') {
+				var level = urlParts[6];
+				if (level && level.trim() != '') {
+					if (level % 100 != 0) {
+						displayCourse(getCourse(faculty, dept, level));
+					} else {
+						try {
+							displayLevel(level, courseData[faculty][dept][level], null, faculty, dept);
+						} catch (e) {
+							displayError("level", e);
+						}
+					}
 				} else {
-					try { displayLevel(level, courseData[faculty][dept][level], null, faculty, dept);
-					} catch (e) { displayError("level", e); }
+					try {
+						displayDepartment(dept, courseData[faculty][dept], null, faculty);
+					} catch (e) {
+						displayError("department", e);
+					}
 				}
 			} else {
 				try {
-					displayDepartment(dept, courseData[faculty][dept], null, faculty);
-				} catch (e) { displayError("department", e); }
+					displayFaculty(faculty, courseData[faculty]);
+				} catch (e) {
+					displayError("faculty", e);
+				}
 			}
-		} else {
-			try {
-				displayFaculty(faculty, courseData[faculty]);
-			} catch (e) { displayError("faculty", e); }
 		}
 	} else {
 		displayAll();
 	}
+}
+
+function reloadContent() {
+	urlChanged();
+	$content.empty();
+	loadContent();
 }
 
 function displayAll() {
@@ -174,8 +192,9 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 
 function getCourse(facultyName, deptName, number) {
 	var dept = courseData[facultyName][deptName][getLevelNum(number)];
-	for (var i = 0; i < dept.length; i++) {
-		var course = dept[i];
+	for (var courseNum in dept) {
+		if(!dept.hasOwnProperty(courseNum)) continue;
+		var course = dept[courseNum];
 		if(course.number == number) {
 			return course;
 		}

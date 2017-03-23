@@ -1,7 +1,7 @@
 var courseData;
 var tree;
 
-function setupSidebar(nodeSelectedCb, cb) {
+function setupSidebar(nodeSelectedCb, stepCb, finishedCb) {
 	courseData = {};
 
 	tree = new InspireTree({
@@ -35,13 +35,12 @@ function setupSidebar(nodeSelectedCb, cb) {
 			courseData[faculty] = {};
 		}
 		loadFacultiesInTree();
-		// cb();	// TODO: Improve course-controller efficiency in handling this...
 
 		var index = 0;
 		function nextFac() {
 			var fac = semester.faculties[index++];
 			if(!fac) {
-				if(cb) cb();
+				if(finishedCb) finishedCb();
 				return;
 			}
 			$.get("/data/courses", { semesterId: semester.id, facultyName: fac }, function(data) {
@@ -50,7 +49,7 @@ function setupSidebar(nodeSelectedCb, cb) {
 				courseData[fac] = data;
 				loadFacultyData(fac);
 				tree.expand();
-				// cb();	// TODO: Improve course-controller efficiency in handling this...
+				if(stepCb) stepCb(fac);
 				nextFac();
 			});
 		}
