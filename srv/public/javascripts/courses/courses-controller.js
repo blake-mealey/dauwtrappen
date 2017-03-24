@@ -71,16 +71,14 @@ function resetBreadcrumbs(faculty, dept, level) {
 }
 
 function urlChanged() {
-	// TODO: Use window.location.(something) instead. (Doesn't have http://url.com/)
-	var url = window.location.href;
-	if (lastUrl && url != lastUrl) return;
-	if(url.indexOf("#") > -1)
-		url = url.substr(0, url.indexOf("#"));
-	if(url.indexOf("?") > -1)
-		url = url.substr(0, url.indexOf("?"));
-	urlParts = url.split("/");
+	var url = window.location.pathname;
+	if (lastUrl && url == lastUrl) return;
+	lastUrl = url;
 
-	if(urlParts[4]) {
+	urlParts = url.split("/");
+	urlParts.shift();
+
+	if(urlParts[1]) {
 		$("#home").addClass("hidden");
 		$("#content").removeClass("hidden");
 	}else {
@@ -88,16 +86,16 @@ function urlChanged() {
 		$("#content").addClass("hidden");
 	}
 
-	resetBreadcrumbs(urlParts[4], urlParts[5], urlParts[6]);
+	resetBreadcrumbs(urlParts[1], urlParts[2], urlParts[3]);
 }
 
 function loadContent(facultyName) {
-	var faculty = urlParts[4];
+	var faculty = urlParts[1];
 	if(faculty && faculty.trim() != '') {
 		if(!facultyName || faculty == facultyName) {
-			var dept = urlParts[5];
+			var dept = urlParts[2];
 			if (dept && dept.trim() != '') {
-				var level = urlParts[6];
+				var level = urlParts[3];
 				if (level && level.trim() != '') {
 					if (level % 100 != 0) {
 						displayCourse(getCourse(faculty, dept, level));
