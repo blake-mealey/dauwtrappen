@@ -31,18 +31,25 @@ $bread-crumbs-height: 40px
   .bread-crumb-tag a:hover
     opacity: 1
 
-#content
+.hidden
+  visibility: hidden
+  position: absolute
+
+.card
+  background-color: $card-background-color
+  padding: 1em
+  margin-bottom: 1em
+  border-radius: 2px
+  +card-shadow
+
+.content
   overflow-y: auto
   height: calc(100% - #{$bread-crumbs-height*1.5})
   padding: 10px
   .nested
     padding: 0 1em 0 1em
   .course
-    background-color: $card-background-color
-    padding: 1em
-    margin-bottom: 1em
-    border-radius: 2px
-    +card-shadow
+    @extend .card
   h1, h2, h3, h4, h5
     display: inline-block
     margin: 10px 0 10px 0

@@ -80,6 +80,14 @@ function urlChanged() {
 		url = url.substr(0, url.indexOf("?"));
 	urlParts = url.split("/");
 
+	if(urlParts[4]) {
+		$("#home").addClass("hidden");
+		$("#content").removeClass("hidden");
+	}else {
+		$("#home").removeClass("hidden");
+		$("#content").addClass("hidden");
+	}
+
 	resetBreadcrumbs(urlParts[4], urlParts[5], urlParts[6]);
 }
 
@@ -116,7 +124,7 @@ function loadContent(facultyName) {
 			}
 		}
 	} else {
-		displayAll();
+		// displayAll();
 	}
 }
 
