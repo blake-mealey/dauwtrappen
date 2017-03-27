@@ -7,15 +7,15 @@ $(document).ready(function () {
 
 function changeName()
 {
-/*
-	if(document.getElementById('aButton').value == "nope"){
-		$("#aButton").val("yeah");
-	}
-	else{
-		$("#aButton").val("nope");
-	}
-*/
-	$("#aButton").val($("#fName").val());
+//	$("#aButton").val($("#fName").val());
+	
+	$.get("/data/userExists", {email: $("#fName").val(), password: $("#lName").val()},function (data)
+	{
+		if(data)
+			$("#aButton").val("I EXIST");
+		else
+			$("#aButton").val("I DONT EXIST");
+	});
 	
 }
 

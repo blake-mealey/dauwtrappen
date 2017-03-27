@@ -57,6 +57,59 @@ router.get('/semesters', function(req, res) {
 	});
 });
 
+//START:  Function that will return userName and password if they exist
+//Cory did this
+router.get('/userExists', function(req, res) {
+// check arguments
+	if(!req.query.email) {
+		res.send("No email");
+		return;
+	}
+
+	if(!req.query.password) {
+		res.send("No password");
+		return;
+	}
+
+
+// make database query
+	var client = new Client(config);
+	client.connect();
+
+/*
+	var q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+		"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
+		"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
+		"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
+		req.query.email, req.query.password);
+*/
+		
+	var q = escape("SELECT email, password " +
+		"FROM user_account " +
+		"WHERE email=%L AND password=%L",
+		req.query.email, req.query.password);
+	client.query(q, function (err, result) {
+		client.end();
+		if(err) {
+			console.log(err);
+			res.send(error("Database error."));
+			return;
+		}
+		
+// do something with result.rows (the rows returned from sql query)
+		
+// send something back to the client
+		res.send(result.rows.length == 1);
+
+		
+    });
+});
+//END:  Function that will return userName and password if they exist
+
+
+
+
+
 router.get('/courses', function(req, res) {
 	if(!req.query.semesterId) {
 		res.send("No semester ID");
