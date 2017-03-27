@@ -190,6 +190,7 @@ function loadFacultyData(facultyName) {
 		for(var levelNum in department) {
 			if(!department.hasOwnProperty(levelNum)) continue;
 			var level = department[levelNum];
+
 			var levelNode = {
 				text: levelNum,
 				link: deptNode.link + levelNum + "/",

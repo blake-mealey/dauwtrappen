@@ -12,7 +12,7 @@ block center
 	//Basically same as html but shortened.
 	.mdl-textfield.mdl-js-textfield#search-box
 		input.mdl-textfield__input#search-box-input(type="text")
-		label.mdl-textfield__label(for="search-box-input") Search...
+		label.mdl-textfield__label(for="login") typeStuffHere
 
 
 	//P for paragragh
@@ -24,20 +24,20 @@ block center
 
 	p First name:
 	//This is the text box on screen
-	input(type="text" name="fname")
-
+	input(type="text" name="fname" id="fName" value="")
+	
 	p Last name:
-
+	
 	//^
-	input(type="text" name="lname")
-
+	input(type="text" name="lname" id="lName" value="")
+	
 	//Submit button.
-	input(type="submit" value="Bana")
+	input(type="submit" value="Bana" id="aButton" onclick="changeName()")
 
 	//Material Design Light, pre styled elements:
 	//https://getmdl.io/components/index.html
-
-
+	
+	
 	//Original:
 	//<!--Raised button
 	//<button class="mdl-button mdl-js-button mdl-button--raised">
