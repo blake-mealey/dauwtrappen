@@ -1,19 +1,12 @@
-@import "colors"
-@import "shadows"
-@import "transitions"
+@import "partials/_colors"
+@import "partials/_shadows"
+@import "partials/_transitions"
 
 .ui-layout-center
   padding: 0
 
-#search-box
-  width: 100%
-  margin-top: -20px
-
 $bread-crumbs-height: 40px
 #bread-crumbs
-  position: absolute
-  top: 0
-  left: 0
   width: 100%
   height: $bread-crumbs-height
   background-color: $bread-crumbs-color
@@ -38,18 +31,29 @@ $bread-crumbs-height: 40px
   .bread-crumb-tag a:hover
     opacity: 1
 
-#content
-  margin-top: $bread-crumbs-height
+.hidden
+  visibility: hidden
+  position: absolute
+
+.card
+  background-color: $card-background-color
+  padding: 1em
+  margin-bottom: 1em
+  border-radius: 2px
+  +card-shadow
+
+.content
+  overflow-y: auto
+  height: calc(100% - #{$bread-crumbs-height*1.5})
   padding: 10px
   .nested
     padding: 0 1em 0 1em
   .course
-    background-color: $card-background-color
-    padding: 1em
-    margin-bottom: 1em
-    border-radius: 2px
-    +card-shadow
-
-.header-link
-  color: #000000
-  margin-left: 20px
+    @extend .card
+  h1, h2, h3, h4, h5
+    display: inline-block
+    margin: 10px 0 10px 0
+  .header-link
+    color: #000000
+    h1:hover, h2:hover, h3:hover, h4:hover, h5:hover
+      text-decoration: underline

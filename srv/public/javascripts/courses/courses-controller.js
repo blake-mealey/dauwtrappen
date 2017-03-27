@@ -1,6 +1,13 @@
+var lastUrl;
+var urlParts;
+var $content;
+
 $(document).ready(function () {
-	setupSidebar(nodeSelected, function() {
-		reloadContent();
+	$content = $("#content");
+
+	urlChanged();
+	setupSidebar(nodeSelected, function(faculty) {
+		loadContent(faculty);
 	});
 
 	window.onpopstate = history.onpushstate = reloadContent;
@@ -38,7 +45,6 @@ function resetBreadcrumbs(faculty, dept, level) {
 	var $crumbs = $("#bread-crumbs");
 	$crumbs.empty();
 
-	// TODO: replace link click with history.pushState
 	var link = "/courses";
 	crumb($crumbs, "Home", link, !faculty);
 	if (faculty) {
@@ -52,7 +58,7 @@ function resetBreadcrumbs(faculty, dept, level) {
 					link += "/" + level;
 					crumb($crumbs, level, link, true);
 				} else {
-					var levelGroup = Math.floor(level/100)*100;
+					var levelGroup = getLevelNum(level);
 					var link2 = link + "/" + levelGroup;
 					crumb($crumbs, levelGroup, link2, false);
 
@@ -64,49 +70,66 @@ function resetBreadcrumbs(faculty, dept, level) {
 	}
 }
 
-var lastUrl;
-var $content;
-function reloadContent() {
-	var url = window.location.href;
-	if (lastUrl && url != lastUrl) return;
-	if(url.indexOf("#") > -1)
-		url = url.substr(0, url.indexOf("#"));
-	if(url.indexOf("?") > -1)
-		url = url.substr(0, url.indexOf("?"));
-	var parts = url.split("/");
+function urlChanged() {
+	var url = window.location.pathname;
+	if (lastUrl && url == lastUrl) return;
+	lastUrl = url;
 
-	$content = $("#content");
-	$content.empty();
+	urlParts = url.split("/");
+	urlParts.shift();
 
-	resetBreadcrumbs(parts[4], parts[5], parts[6]);
-	var faculty = parts[4];
+	if(urlParts[1]) {
+		$("#home").addClass("hidden");
+		$("#content").removeClass("hidden");
+	}else {
+		$("#home").removeClass("hidden");
+		$("#content").addClass("hidden");
+	}
 
+	resetBreadcrumbs(urlParts[1], urlParts[2], urlParts[3]);
+}
+
+function loadContent(facultyName) {
+	var faculty = urlParts[1];
 	if(faculty && faculty.trim() != '') {
-		var dept = parts[5];
-
-		if(dept && dept.trim() != '') {
-			var level = parts[6];
-
-			if(level && level.trim() != '') {
-				if(level % 100 != 0) {
-					displayCourse(getCourse(faculty, dept, level));
+		if(!facultyName || faculty == facultyName) {
+			var dept = urlParts[2];
+			if (dept && dept.trim() != '') {
+				var level = urlParts[3];
+				if (level && level.trim() != '') {
+					if (level % 100 != 0) {
+						displayCourse(getCourse(faculty, dept, level));
+					} else {
+						try {
+							displayLevel(level, courseData[faculty][dept][level], null, faculty, dept);
+						} catch (e) {
+							displayError("level", e);
+						}
+					}
 				} else {
-					try { displayLevel(level, courseData[faculty][dept][level], null, faculty, dept);
-					} catch (e) { displayError("level", e); }
+					try {
+						displayDepartment(dept, courseData[faculty][dept], null, faculty);
+					} catch (e) {
+						displayError("department", e);
+					}
 				}
 			} else {
 				try {
-					displayDepartment(dept, courseData[faculty][dept], null, faculty);
-				} catch (e) { displayError("department", e); }
+					displayFaculty(faculty, courseData[faculty]);
+				} catch (e) {
+					displayError("faculty", e);
+				}
 			}
-		} else {
-			try {
-				displayFaculty(faculty, courseData[faculty]);
-			} catch (e) { displayError("faculty", e); }
 		}
 	} else {
-		displayAll();
+		// displayAll();
 	}
+}
+
+function reloadContent() {
+	urlChanged();
+	$content.empty();
+	loadContent();
 }
 
 function displayAll() {
@@ -117,22 +140,22 @@ function displayAll() {
 	}
 }
 
-function appendLink($obj, url) {
-	var $a = $("<a class='material-icons header-link' href=''>link</a>");
+function createLinkHeader($parent, tag, text, url) {
+	var $a = $("<a class='header-link' href=''>");
 	$a.click(function(e) {
 		e.preventDefault();
 		history.pushState(null, null, url);
 		reloadContent();
 	});
-	$obj.append($a);
+	var $h = $(tag, { text: text });
+	$a.append($h);
+	$parent.append($a);
 }
 
 function displayFaculty(name, faculty) {
 	if(!faculty) return displayError("faculty");
 	var $faculty = $("<div>", { class: "nested" });
-	var $h = $("<h1>", { text: name });
-	appendLink($h, "/courses/" + name);
-	$faculty.append($h);
+	createLinkHeader($faculty, "<h1>", name, "/courses/" + name);
 	for(var deptName in faculty) {
 		if (!faculty.hasOwnProperty(deptName)) continue;
 		var dept = faculty[deptName];
@@ -141,31 +164,12 @@ function displayFaculty(name, faculty) {
 	$content.append($faculty);
 }
 
-function getDepartmentFullName(name) {
-	for(var facultyName in courseData) {
-		if(!courseData.hasOwnProperty(facultyName)) continue;
-
-		var faculty = courseData[facultyName];
-		if(faculty[name]) {
-			var dept = faculty[name];
-			for(var levelNum in dept) {
-				if(!dept.hasOwnProperty(levelNum)) continue;
-
-				var level = dept[levelNum];
-				return level[0].dept_full_name;
-			}
-		}
-	}
-}
-
 function displayDepartment(name, department, $parent, facultyName) {
 	if(!department) return displayError("department");
 	$parent = $parent ? $parent : $content;
 
 	var $dept = $("<div>", { class: "nested" });
-	var $h = $("<h2>", { text: getDepartmentFullName(name) });
-	appendLink($h, "/courses/" + facultyName + "/" + name);
-	$dept.append($h);
+	createLinkHeader($dept, "<h2>", getDepartmentFullName(name), "/courses/" + facultyName + "/" + name);
 
 	for(var levelNum in department) {
 		if (!department.hasOwnProperty(levelNum)) continue;
@@ -180,13 +184,12 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 	$parent = $parent ? $parent : $content;
 
 	var $level = $("<div>", { class: "nested" });
-	var $h = $("<h3>", { text: num + " Level Courses" });
-	appendLink($h, "/courses/" + facultyName + "/" + deptName + "/" + num);
-	$level.append($h);
+	createLinkHeader($level, "<h3>", num + " Level Courses", "/courses/" + facultyName + "/" + deptName + "/" + num);
 
 	var $courses = $("<div>", { class: "nested" });
-	for (var i = 0; i < level.length; i++) {
-		var course = level[i];
+	for(var courseNum in level) {
+		if(!level.hasOwnProperty(courseNum)) continue;
+		var course = level[courseNum];
 		displayCourse(course, $courses);
 	}
 	$level.append($courses);
@@ -194,9 +197,10 @@ function displayLevel(num, level, $parent, facultyName, deptName) {
 }
 
 function getCourse(facultyName, deptName, number) {
-	var dept = courseData[facultyName][deptName][Math.floor(number/100)*100];
-	for (var i = 0; i < dept.length; i++) {
-		var course = dept[i];
+	var dept = courseData[facultyName][deptName][getLevelNum(number)];
+	for (var courseNum in dept) {
+		if(!dept.hasOwnProperty(courseNum)) continue;
+		var course = dept[courseNum];
 		if(course.number == number) {
 			return course;
 		}
@@ -211,10 +215,8 @@ function displayCourse(course, $parent) {
 		class: "course"
 	});
 
-	var $h = $("<h4>", {text: course.number + ": " + course.name});
-	appendLink($h, "/courses/" + course.fac_name + "/" + course.dept_name + "/" + course.number);
+	createLinkHeader($course, "<h4>", course.number + ": " + course.name, "/courses/" + course.fac_name + "/" + course.dept_name + "/" + course.number);
 
-	$course.append($h);
 	$course.append($("<p>", {text: course.description}));
 	$parent.append($course);
 }
@@ -223,4 +225,8 @@ function displayError(type, e) {
 	if(e) console.log(e);
 	$content.append($("<h4>", { text: "No such " + type + " exists 😞. Make sure your URL is correct." }));
 	return false;
+}
+
+function getLevelNum(courseNum) {
+	return Math.floor(courseNum.substr(0, 3)/100)*100
 }

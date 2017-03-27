@@ -1,5 +1,6 @@
 var request = require("request");
 var xml2js = require("xml2js");
+var escape = require('pg-escape');
 
 var Client = require("pg").Client;
 
@@ -23,23 +24,24 @@ function scrapeSemesters() {
 			if (err) return console.log("Parsing error: " + err);
 
 			data = data.termlist.term;
-			for(var termName in data) {
-				if(!data.hasOwnProperty(termName)) continue;
-				var term = data[termName].$;
-				if(term.desc == "Summer 2016") {
-					break;
+
+			var index = 0;
+			function each() {
+				if(data[index]) {
+					var term = data[index++].$;
+					console.log(term);
+					semesterId = term.name;
+					saveSemester(term, function () {
+						scrapeSemester(term.name, each);
+					});
 				}
 			}
-
-			semesterId = term.name;
-			saveSemester(term, function () {
-				scrapeSemester(term.name);
-			});
+			each();
 		});
 	});
 }
 
-function scrapeSemester(name) {
+function scrapeSemester(name, cb) {
 	request(baseUrl + name + ".xml", function (err, res) {
 		if (err) return console.log("Request error: " + err);
 		if (res.statusCode != 200) return console.log("Status code not 200: " + res.statusCode);
@@ -50,7 +52,11 @@ function scrapeSemester(name) {
 			courses = courses.coursedetails.course;
 			var index = 0;
 			function each() {
-				saveCourse(courses[index++], each);
+				if(!courses[index]) {
+					if(cb) cb();
+				} else {
+					saveCourse(courses[index++], each);
+				}
 			}
 			each();
 		});
@@ -61,15 +67,11 @@ function setupSave(cb) {
 	var client = new Client(config);
 	client.connect();
 
-	client.query("DELETE FROM faculty WHERE name='Dump'", function(err, result) {
+	client.query("DELETE FROM faculty", function(err) {
 		if(err) return console.log(err);
 
-		client.query("INSERT INTO faculty VALUES('Dump')", function(err, result) {
-			if(err) return console.log(err);
-
-			client.end();
-			if(cb) cb();
-		});
+		client.end();
+		if(cb) cb();
 	});
 }
 
@@ -79,7 +81,9 @@ function saveSemester(semester, cb) {
 	var client = new Client(config);
 	client.connect();
 
-	client.query("INSERT INTO semester VALUES(" + semester.name + ",'" + semester.desc + "') ON CONFLICT DO NOTHING", function (err, result) {
+	var q = escape("INSERT INTO semester VALUES(%s,%L) ON CONFLICT DO NOTHING", semester.name, semester.desc);
+	// console.log(q);
+	client.query(q, function (err) {
 		if(err) return console.log(err);
 
 		client.end();
@@ -87,18 +91,36 @@ function saveSemester(semester, cb) {
 	});
 }
 
-function saveDepartment(client, dept, cb) {
-	client.query("INSERT INTO department VALUES('" + dept + "','" + dept + "') ON CONFLICT DO NOTHING", function (err, result) {
+function saveFaculty(client, faculty, cb) {
+	var q = escape("INSERT INTO faculty VALUES(%L) ON CONFLICT DO NOTHING", faculty);
+	// console.log(q);
+	client.query(q, function(err) {
 		if(err) return console.log(err);
-		client.query("INSERT INTO faculty_contains VALUES('Dump','" + dept + "') ON CONFLICT DO NOTHING", function (err, result) {
+		cb();
+	});
+}
+
+function saveDepartment(client, dept, cb) {
+	var faculty = dept[0];
+	saveFaculty(client, faculty, function() {
+		var q = escape("INSERT INTO department VALUES(%L,%L) ON CONFLICT DO NOTHING", dept, dept);
+		// console.log(q);
+		client.query(q, function (err) {
 			if(err) return console.log(err);
-			cb();
+			q = escape("INSERT INTO faculty_contains VALUES(%L,%L) ON CONFLICT DO NOTHING", faculty, dept);
+			// console.log(q);
+			client.query(q, function (err) {
+				if(err) return console.log(err);
+				cb();
+			});
 		});
 	});
 }
 
 function saveInstructor(client, name, cb) {
-	client.query("INSERT INTO instructor VALUES('" + name + "') ON CONFLICT DO NOTHING", function (err, result) {
+	var q = escape("INSERT INTO instructor VALUES(%L) ON CONFLICT DO NOTHING", name);
+	// console.log(q);
+	client.query(q, function (err) {
 		if(err) return console.log(err);
 		cb();
 	});
@@ -107,20 +129,12 @@ function saveInstructor(client, name, cb) {
 var semesterId;
 var sectionId = 0;
 function saveSection(client, dept, courseNum, section, cb) {
-	var q = "INSERT INTO course_section VALUES(" +
-		"'" + ((section.$.type == "Lecture") ? "LEC" : (section.$.type == "Lab") ? "LAB" : "TUT") + "', " +
-		semesterId + ", " +
-		section.$.group + ", " +
-		(section.time ? ("'" + section.time[0].$.day + section.time[0].$.time + "'") : "NULL") + ", " +
-		"'" + section.room[0] + "', " +
-		sectionId++ + ", " +
-		"NULL, " +
-		"'" + section.instructor + "', " +
-		"'" + courseNum + "', " +
-		"'" + dept + "'" +
-		") ON CONFLICT DO NOTHING";
+	var type = ((section.$.type == "Lecture") ? "LEC" : (section.$.type == "Lab") ? "LAB" : "TUT");
+	var time = (section.time ? ("'" + section.time[0].$.day + section.time[0].$.time + "'") : "NULL");
+	var q = escape("INSERT INTO course_section VALUES(%L,%s,%s,%s,%L,%s,NULL,%L,%L,%L) ON CONFLICT DO NOTHING",
+		type, semesterId, section.$.name, time, section.room[0], sectionId++, section.instructor, courseNum, dept);
 	// console.log(q);
-	client.query(q, function (err, result) {
+	client.query(q, function (err) {
 		if(err) return console.log(err);
 		cb();
 	});
@@ -133,10 +147,12 @@ function saveCourse(course, cb) {
 	client.connect();
 
 	var num = course.$.number;
-	var name = course.description[0].replace(/'/g, '"');
+	var name = course.description[0];
 	var dept = course.$.subject;
 	saveDepartment(client, dept, function () {
-		client.query("INSERT INTO course VALUES('" + name + "','" + name + "','" + num + "','" + dept + "') ON CONFLICT DO NOTHING", function (err, result) {
+		var q = escape("INSERT INTO course VALUES(%L,%L,%L,%L) ON CONFLICT DO NOTHING", name, name, num, dept);
+		// console.log(q);
+		client.query(q, function (err) {
 			if(err) return console.log(err);
 
 			var sections = course.periodic;
@@ -149,8 +165,7 @@ function saveCourse(course, cb) {
 					return;
 				}
 
-				section.instructor = section.instructor[0].replace(/'/g, '"');
-				// console.log(section);
+				section.instructor = section.instructor[0];
 				saveInstructor(client, section.instructor, function() {
 					saveSection(client, dept, num, section, each);
 				});

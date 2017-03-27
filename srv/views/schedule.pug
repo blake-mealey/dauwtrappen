@@ -1,4 +1,14 @@
 extends layout
 
+block head
+	link(rel='stylesheet', href='/stylesheets/inspire-tree.css')
+
+	script(type="text/javascript" src='/javascripts/courses/inspire-tree-bundled.min.js')
+	script(type="text/javascript" src='/javascripts/sidebar-control.js')
+	script(type="text/javascript" src='/javascripts/schedule/schedule-controller.js')
+
+block body
+	include includes/sidebar
+
 block center
-	h5 TODO(Ben): Schedule UI
+	h5 TODO (Ben): Schedule UI

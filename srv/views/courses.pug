@@ -5,17 +5,33 @@ block head
 	link(rel='stylesheet', href='/stylesheets/inspire-tree.css')
 
 	script(type="text/javascript" src='/javascripts/courses/inspire-tree-bundled.min.js')
-	script(type="text/javascript" src='/javascripts/util/fts_fuzzy_match.js')
 	script(type="text/javascript" src='/javascripts/sidebar-control.js')
 	script(type="text/javascript" src='/javascripts/courses/courses-controller.js')
 
 block body
-	.ui-layout-west
-		.mdl-textfield.mdl-js-textfield#search-box
-			input.mdl-textfield__input#search-box-input(type="text")
-			label.mdl-textfield__label(for="search-box-input") Search...
-		#courses-list
+	include includes/sidebar
 
 block center
 	#bread-crumbs
-	#content
+	#home.content.hidden
+		.card
+			h4 To-Do
+			p.
+				Put something useful here. Should it be a tutorial like I started below? Probably. Make whatever
+				is here interactive? Add some colour/pictures?
+		.card
+			h4 Sidebar
+			p.
+				Click on a faculty, department, level, or course in the sidebar to display it here, in the
+				content window. You can also search the sidebar using the search bar at the top. More
+				instructions for that here when we implement that properly.
+			p.
+				You can also filter the sidebar to make your searches more powerful and specific. More on that
+				once we implement it.
+		.card
+			h4 URLs
+			p.
+				All of the URLs which this site uses are shareable, and we update the URL whenever you load a
+				faculty, department, level, or course, plus whenever you change your search or filter! So,
+				copy-pasta that URL and share whatever funky searches/results you found with your friends.
+	#content.content

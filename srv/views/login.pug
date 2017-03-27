@@ -4,6 +4,58 @@ block head
 	script(type="text/javascript" src='/javascripts/login/login-controller.js')
 
 block center
-	h5 TODO(Cory): Login UI
+	h5 TODO (Cory): Login UI
 
-	p Hello World!
+	p First change!
+	//This is a text box.
+	//The format for this page is called pug.  Google pug to learn syntax
+	//Basically same as html but shortened.
+	.mdl-textfield.mdl-js-textfield#search-box
+		input.mdl-textfield__input#search-box-input(type="text")
+		label.mdl-textfield__label(for="search-box-input") Search...
+
+
+	//P for paragragh
+	//Original:
+	//	First name: <input type="text" name="fname"><br>
+	// Last name: <input type="text" name="lname"><br>ls
+	// <input type="submit" value="Submit">
+	//loc: https://www.w3schools.com/tags/tag_input.asp
+
+	p First name:
+	//This is the text box on screen
+	input(type="text" name="fname")
+
+	p Last name:
+
+	//^
+	input(type="text" name="lname")
+
+	//Submit button.
+	input(type="submit" value="Bana")
+
+	//Material Design Light, pre styled elements:
+	//https://getmdl.io/components/index.html
+
+
+	//Original:
+	//<!--Raised button
+	//<button class="mdl-button mdl-js-button mdl-button--raised">
+	//  Button
+	//</button>
+
+	//<!-- Raised button
+	button(class="mdl-button mdl-js-button mdl-button--raised") Carrot
+
+	//git status :  this gets a report of all the files you have changed/have added
+	//git add M  :  M = file name or --all : this adds M
+	//git commit -m "-message-"  : this creates a stage in the history of the
+	//proj with my changes
+	//git push  : pushes your commit (can do multiple commits before pushing
+	//generally should pull before pushing, because if someone modified the
+	//Same file as you.
+
+	//git diff  : shows changes you have made that have not been added
+
+
+

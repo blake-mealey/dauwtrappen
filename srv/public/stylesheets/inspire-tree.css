@@ -370,7 +370,7 @@
 }
 
 .inspire-tree .loading>.title-wrap .title:before {
-    background: url(863c5a2796b088dea28a1f75a0973372.gif) 0 0 no-repeat;
+    background: url("../images/spinner.gif") 0 0 no-repeat;
     content: "";
     height: 14px;
     width: 14px
