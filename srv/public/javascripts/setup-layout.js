@@ -8,6 +8,10 @@ $(document).ready(function () {
 		west: {
 			closable: false,
 			size: 400
+		},
+		east: {
+			closable: false,
+			size: 400	
 		}
 	});
 });

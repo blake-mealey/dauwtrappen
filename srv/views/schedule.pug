@@ -2,6 +2,8 @@ extends layout
 
 block head
 	link(rel='stylesheet', href='/stylesheets/inspire-tree.css')
+	link(rel='stylesheet', href='/stylesheets/schedule.css')
+	
 
 	script(type="text/javascript" src='/javascripts/courses/inspire-tree-bundled.min.js')
 	script(type="text/javascript" src='/javascripts/sidebar-control.js')
@@ -9,6 +11,30 @@ block head
 
 block body
 	include includes/sidebar
+	.ui-layout-east
+		h4 Selected Courses:
+		.divider
+		.card
+			p Hello World
+		.card
+			p Hello World
+		.card
+			p Hello World
+		.card
+			p Hello World
+
 
 block center
-	h5 TODO (Ben): Schedule UI
+	table
+		tr
+			each val2 in ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+				th= val2
+		- for (var i = 6; i <= 19; i++) 
+			tr
+				each val2 in [1, 2, 3, 4, 5, 6, 7, 8]
+					if val2 == 1
+						th= (i % 12 + 1 + ":00 " + (i > 10 ? "PM" : "AM"))
+					else
+						th
+		
+			
