@@ -13,13 +13,21 @@ function loggingIn()
 	{
 		$("#emailTF").text("Email: ");
 		$("#passwordTF").text("Password: ");
-		if(data)
+		if(data == "NE")
 		{
-			$("#emailTF").val("Email: Valid Login");
+			$("#emailTF").text("Email: No email entered");
 		}
-		else
+		else if(data == "NP")
 		{
-			$("#emailTF").val("Email: Invalid Login");
+			$("#passwordTF").text("Password: No password entered");
+		}
+		else if(data == "ILI")
+		{
+			$("#emailTF").text("Email: Wrong Email or Password");
+		}
+		else if(data == "LI")
+		{
+			$("#emailTF").text("Email: Logging In");
 		}
 	});
 	

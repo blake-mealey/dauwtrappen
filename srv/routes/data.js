@@ -62,12 +62,12 @@ router.get('/semesters', function(req, res) {
 router.get('/login', function(req, res) {
 // check arguments
 	if(!req.query.email) {
-		res.send(false);
+		res.send("NE");
 		return;
 	}
 
 	if(!req.query.password) {
-		res.send(false);
+		res.send("NP");
 		return;
 	}
 
@@ -99,7 +99,14 @@ router.get('/login', function(req, res) {
 // do something with result.rows (the rows returned from sql query)
 		
 // send something back to the client
-		res.send(result.rows.length == 1);
+		if(result.rows.length == 1)
+		{
+			res.send("LI");
+		}
+		else
+		{
+			res.send("ILI");
+		}
 
 		
     });
