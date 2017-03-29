@@ -134,7 +134,7 @@ router.get('/createAccount', function(req, res) {
 
 		
 	//START: creates query and gets results
-	var q = escape("SELECT email" +
+	var q = escape("SELECT email " +
 		"FROM user_account " +
 		"WHERE email=%L ",
 		req.query.email);
