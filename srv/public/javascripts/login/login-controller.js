@@ -49,7 +49,7 @@ function createAccount()
 		}
 		else if(data == "IPE")
 		{
-			$("#passwordTF").text("Email: Invalid Password Entered");
+			$("#passwordTF").text("Password: Invalid Password Entered");
 		}
 		else if(data == "EIU")
 		{
