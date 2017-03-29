@@ -25,6 +25,17 @@ tr, th {
   width: 100%;
   height: 1px;
   background: black;
-  margin-bottom: 5px; }
+  margin-bottom: 10px; }
+
+#selected-courses .card {
+  position: relative; }
+  #selected-courses .card p {
+    margin: 0; }
+  #selected-courses .card h5 {
+    margin: 0 0 10px 0; }
+  #selected-courses .card .close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px; }
 
 /*# sourceMappingURL=schedule.css.map */

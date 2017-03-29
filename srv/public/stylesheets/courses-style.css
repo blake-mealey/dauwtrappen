@@ -35,10 +35,6 @@
   #bread-crumbs .bread-crumb-tag a:hover {
     opacity: 1; }
 
-.hidden {
-  visibility: hidden;
-  position: absolute; }
-
 .content {
   overflow-y: auto;
   height: calc(100% - 60px);

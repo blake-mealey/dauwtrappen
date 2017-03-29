@@ -44,4 +44,8 @@ a:hover {
   width: 100%;
   margin-top: -20px; }
 
+.hidden {
+  visibility: hidden;
+  position: absolute; }
+
 /*# sourceMappingURL=style.css.map */
