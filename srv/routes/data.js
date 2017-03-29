@@ -62,12 +62,12 @@ router.get('/semesters', function(req, res) {
 router.get('/userExists', function(req, res) {
 // check arguments
 	if(!req.query.email) {
-		res.send("No email");
+		res.send(false);
 		return;
 	}
 
 	if(!req.query.password) {
-		res.send("No password");
+		res.send(false);
 		return;
 	}
 
