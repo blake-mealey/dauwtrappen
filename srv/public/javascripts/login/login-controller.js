@@ -11,13 +11,15 @@ function loggingIn()
 	
 	$.get("/data/login", {email: $("#email").val(), password: $("#password").val()},function (data)
 	{
+		$("#emailTF").text("Email: ");
+		$("#passwordTF").text("Password: ");
 		if(data)
 		{
-			$("#login").val("I EXIST");
+			$("#emailTF").val("Email: Valid Login");
 		}
 		else
 		{
-			$("#login").val("I DONT EXIST");
+			$("#emailTF").val("Email: Invalid Login");
 		}
 	});
 	
@@ -30,21 +32,24 @@ function createAccount()
 {
 	$.get("/data/createAccount", {email: $("#email").val(), password: $("#password").val()},function (data)
 	{
+		$("#emailTF").text("Email: ");
+		$("#passwordTF").text("Password: ");
+		
 		if(data == "IEE")
 		{
-			$("#create").val("Invalid Email Entered");
+			$("#emailTF").text("Email: Invalid Email Entered");
 		}
 		else if(data == "IPE")
 		{
-			$("#create").val("Invalid Password Entered");
+			$("#passwordTF").text("Email: Invalid Password Entered");
 		}
 		else if(data == "EIU")
 		{
-			$("#create").val("Email In Use");
+			$("#emailTF").text("Email: Email In Use");
 		}
 		else if(data == "AC")
 		{
-			$("#create").val("Account Created");
+			$("#emailTF").text("Email: Account Created");
 		}
 	});
 	
