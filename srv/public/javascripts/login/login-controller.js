@@ -5,19 +5,48 @@ $(document).ready(function () {
 
 
 
-function changeName()
+function loggingIn()
 {
 //	$("#aButton").val($("#fName").val());
 	
-	$.get("/data/userExists", {email: $("#fName").val(), password: $("#lName").val()},function (data)
+	$.get("/data/login", {email: $("#email").val(), password: $("#password").val()},function (data)
 	{
 		if(data)
-			$("#aButton").val("I EXIST");
+		{
+			$("#login").val("I EXIST");
+		}
 		else
-			$("#aButton").val("I DONT EXIST");
+		{
+			$("#login").val("I DONT EXIST");
+		}
 	});
 	
 }
 
 
+
+
+function createAccount()
+{
+	$.get("/data/createAccount", {email: $("#email").val(), password: $("#password").val()},function (data)
+	{
+		if(data == "IEE")
+		{
+			$("#create").val("Invalid Email Entered");
+		}
+		else if(data == "IPE")
+		{
+			$("#create").val("Invalid Password Entered");
+		}
+		else if(data == "EIU")
+		{
+			$("#create").val("Email In Use");
+		}
+		else if(data == "AC")
+		{
+			$("#create").val("Account Created");
+		}
+	});
+	
+}
 

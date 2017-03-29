@@ -4,15 +4,15 @@ block head
 	script(type="text/javascript" src='/javascripts/login/login-controller.js')
 
 block center
-	h5 TODO (Cory): Login UI
+	//h5 TODO (Cory): Login UI
 
-	p First change!
+	//p First change!
 	//This is a text box.
 	//The format for this page is called pug.  Google pug to learn syntax
 	//Basically same as html but shortened.
-	.mdl-textfield.mdl-js-textfield#search-box
-		input.mdl-textfield__input#search-box-input(type="text")
-		label.mdl-textfield__label(for="login") typeStuffHere
+	//.mdl-textfield.mdl-js-textfield#search-box
+	//	input.mdl-textfield__input#search-box-input(type="text")
+	//	label.mdl-textfield__label(for="login") typeStuffHere
 
 
 	//P for paragragh
@@ -22,17 +22,53 @@ block center
 	// <input type="submit" value="Submit">
 	//loc: https://www.w3schools.com/tags/tag_input.asp
 
-	p First name:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	p Email:
 	//This is the text box on screen
-	input(type="text" name="fname" id="fName" value="")
+	input(type="text" name="email" id="email" value="")
 	
-	p Last name:
+	p Password:
 	
 	//^
-	input(type="text" name="lname" id="lName" value="")
+	input(type="text" name="password" id="password" value="")
 	
-	//Submit button.
-	input(type="submit" value="Bana" id="aButton" onclick="changeName()")
+	//Login button.
+	input(type="submit" value="Login" id="login" onclick="loggingIn()")
+
+
+	//Create Account button.
+	input(type="submit" value="Create" id="create" onclick="createAccount()")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//Material Design Light, pre styled elements:
 	//https://getmdl.io/components/index.html
@@ -45,7 +81,7 @@ block center
 	//</button>
 
 	//<!-- Raised button
-	button(class="mdl-button mdl-js-button mdl-button--raised") Carrot
+	//button(class="mdl-button mdl-js-button mdl-button--raised") Carrot
 
 	//git status :  this gets a report of all the files you have changed/have added
 	//git add M  :  M = file name or --all : this adds M

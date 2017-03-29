@@ -59,7 +59,7 @@ router.get('/semesters', function(req, res) {
 
 //START:  Function that will return userName and password if they exist
 //Cory did this
-router.get('/userExists', function(req, res) {
+router.get('/login', function(req, res) {
 // check arguments
 	if(!req.query.email) {
 		res.send(false);
@@ -106,6 +106,59 @@ router.get('/userExists', function(req, res) {
 });
 //END:  Function that will return userName and password if they exist
 
+
+//START:  Function for assisting in account creation
+router.get('/createAccount', function(req, res) {
+// check arguments
+	if(!req.query.email) {
+		res.send("IEE");
+		return;
+	}
+
+	if(!req.query.password) {
+		res.send("IPE");
+		return;
+	}
+
+
+// make database query
+	var client = new Client(config);
+	client.connect();
+
+		
+	//START: creates query and gets results
+	var q = escape("SELECT email" +
+		"FROM user_account " +
+		"WHERE email=%L ",
+		req.query.email);
+	client.query(q, function (err, result)
+	{
+		client.end();
+		if(err) {
+			console.log(err);
+			res.send(error("Database error."));
+			return;
+		}
+			
+		//START: if statement for returning if username already exists
+		if(result.rows.length == 1)
+		{
+			res.send("EIU"); //return false cause email is in use
+		}
+		//END: if statement for returning if username already exists
+		else
+		{
+			var q = escape("INSERT " +
+				"INTO user_account " +
+				"VALUES (%L,%L) ",
+				req.query.email,req.query.password);
+				
+			res.send("AC");
+		}
+    });
+	//END: creates query and gets results
+});
+//END:  Function for assisting in account creation
 
 
 
