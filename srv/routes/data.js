@@ -133,8 +133,8 @@ router.get('/createAccount', function(req, res) {
 		req.query.email);
 	client.query(q, function (err, result)
 	{
-		client.end();
 		if(err) {
+			client.end();
 			console.log(err);
 			res.send(error("Database error."));
 			return;
@@ -143,7 +143,9 @@ router.get('/createAccount', function(req, res) {
 		//START: if statement for returning if username already exists
 		if(result.rows.length == 1)
 		{
+			client.end();
 			res.send("EIU"); //return false cause email is in use
+			return;
 		}
 		//END: if statement for returning if username already exists
 		else
@@ -152,8 +154,19 @@ router.get('/createAccount', function(req, res) {
 				"INTO user_account " +
 				"VALUES (%L,%L) ",
 				req.query.email,req.query.password);
-				
-			res.send("AC");
+	
+			client.query(q, function (err, result)
+			{
+				client.end();
+				if(err) {
+					console.log(err);
+					res.send(error("Database error."));
+					return;
+				}
+			
+				res.send("AC");
+				return;
+			});
 		}
     });
 	//END: creates query and gets results
