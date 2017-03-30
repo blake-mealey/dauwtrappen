@@ -12,10 +12,23 @@ var config = {
 	port: 5432 //env var: PGPORT
 };
 
-function error(msg) {		// TODO: Better error messages (machine-readable)
+var DB_ERROR = "DATABASE_ERROR";
+var ARG_MISSING = "ARGUMENT_MISSING";
+
+function error(msg, val) {
 	return {
-		error: msg
+		ok: false,
+		error: msg,
+		val: val
 	};
+}
+
+function success(dataName, data) {
+	var res = {
+		ok: true
+	};
+	res[dataName] = data;
+	return res;
 }
 
 router.get('/semesters', function(req, res) {
@@ -29,7 +42,7 @@ router.get('/semesters', function(req, res) {
 		client.end();
 		if(err) {
 			console.log(err);
-			res.send(error("Database error."));
+			res.send(error(DB_ERROR));
 			return;
 		}
 
@@ -53,9 +66,112 @@ router.get('/semesters', function(req, res) {
 			list.push(semesters[id]);
 		}
 
-		res.send(list);
+		res.send(success("semesters", list));
 	});
 });
+
+router.get('/faculties', function(req, res) {
+	var client = new Client(config);
+	client.connect();
+
+	var q = escape("SELECT f.* FROM faculty as f");
+	console.log(q);
+	client.query(q, function(err, result) {
+		client.end();
+		if(err) {
+			console.log(err);
+			res.send(error(DB_ERROR));
+			return;
+		}
+
+		var list = [];
+		for(var i = 0; i < result.rows.length; i++) {
+			list.push(result.rows[i].name);
+		}
+
+		res.send(success("faculties", list));
+	});
+});
+
+router.get('/courses', function(req, res) {
+	if(!req.query.facultyName) {
+		res.send(error(ARG_MISSING, "FACULTY_NAME"));
+		return;
+	}
+
+	var client = new Client(config);
+	client.connect();
+
+	var q;
+	if(req.query.semesterId) {
+		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+			"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
+			"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
+			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
+			req.query.semesterId, req.query.facultyName);
+	} else {
+		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+			"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
+			"WHERE s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
+			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
+			req.query.facultyName);
+	}
+
+	client.query(q, function (err, result) {
+		client.end();
+		if(err) {
+			console.log(err);
+			res.send(error(DB_ERROR));
+			return;
+		}
+
+		var courseData = {};
+		for (var i = 0; i < result.rows.length; i++) {
+			var obj = result.rows[i];
+			var parent = courseData;
+
+			if(!parent[obj.dept_name]) parent[obj.dept_name] = {};
+			parent = parent[obj.dept_name];
+
+			var level = Math.floor(Number(obj.course_num.substr(0,3))/100) * 100;
+			if(!parent[level]) parent[level] = {};
+			parent = parent[level];
+
+			if(!parent[obj.course_num]) {
+				parent[obj.course_num] = {
+					dept_full_name: obj.dept_full_name,
+					dept_name: obj.dept_name,
+					description: obj.description,
+					fac_name: obj.fac_name,
+					name: obj.name,
+					number: obj.course_num,
+					sections: []
+				};
+			}
+			parent = parent[obj.number];
+
+			parent.sections.push({
+				section_number: obj.number,
+				type: obj.type,
+				time: obj.time,
+				location: obj.location,
+				section_id: obj.id,
+				instr_name: obj.ta_name || obj.instr_name
+			});
+		}
+
+		res.send(success("courses", courseData));
+	});
+});
+
+
+
+
+
+
+
+
+
 
 //START:  Function that will return userName and password if they exist
 //Cory did this
@@ -182,71 +298,5 @@ router.get('/createAccount', function(req, res) {
 
 
 
-
-router.get('/courses', function(req, res) {
-	if(!req.query.semesterId) {
-		res.send("No semester ID");
-		return;
-	}
-
-	if(!req.query.facultyName) {
-		res.send("No faculty name");
-		return;
-	}
-
-	var client = new Client(config);
-	client.connect();
-
-	var q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
-		"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
-		"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
-		"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
-		req.query.semesterId, req.query.facultyName);
-	client.query(q, function (err, result) {
-		client.end();
-		if(err) {
-			console.log(err);
-			res.send(error("Database error."));
-			return;
-		}
-
-		var courseData = {};
-		for (var i = 0; i < result.rows.length; i++) {
-			var obj = result.rows[i];
-			var parent = courseData;
-
-			if(!parent[obj.dept_name]) parent[obj.dept_name] = {};
-			parent = parent[obj.dept_name];
-
-			var level = Math.floor(Number(obj.course_num.substr(0,3))/100) * 100;
-			if(!parent[level]) parent[level] = {};
-			parent = parent[level];
-
-			if(!parent[obj.course_num]) {
-				parent[obj.course_num] = {
-					dept_full_name: obj.dept_full_name,
-					dept_name: obj.dept_name,
-					description: obj.description,
-					fac_name: obj.fac_name,
-					name: obj.name,
-					number: obj.course_num,
-					sections: []
-				};
-			}
-			parent = parent[obj.number];
-
-			parent.sections.push({
-				section_number: obj.number,
-				type: obj.type,
-				time: obj.time,
-				location: obj.location,
-				section_id: obj.id,
-				instr_name: obj.ta_name || obj.instr_name
-			});
-		}
-
-		res.send(courseData);
-	});
-});
 
 module.exports = router;

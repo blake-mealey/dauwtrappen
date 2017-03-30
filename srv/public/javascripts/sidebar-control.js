@@ -3,7 +3,7 @@ var currentSemester;
 var courseData;
 var tree;
 
-function setupSidebar(nodeSelectedCb, stepCb, finishedCb) {
+function setupSidebar(bySemesters, nodeSelectedCb, stepCb, finishedCb) {
 	semesterData = {};
 
 	tree = new InspireTree({
@@ -27,15 +27,22 @@ function setupSidebar(nodeSelectedCb, stepCb, finishedCb) {
 	if(nodeSelectedCb) tree.on("node.selected", nodeSelectedCb);
 
 	setupSearch();
+
+	if(bySemesters) {
+		loadBySemesters(stepCb, finishedCb);
+	} else {
+		loadAll(stepCb, finishedCb);
+	}
+}
+
+function loadBySemesters(stepCb, finishedCb) {
 	setupSemesterSelector();
-
 	// TODO: Read the semester query from the URL
+	$.get("/data/semesters", function(res) {
+		if(!res || !res.ok) return;
+		var semesters = res.semesters;
 
-	$.get("/data/semesters", function(semesters) {
-		if(!semesters) return;
-
-		var $selector = $("#semester_selector");
-
+		var $selector = $("#semester-selector");
 		for(var i = 0; i < semesters.length; i++) {
 			var semester = semesters[i];
 			$selector.append($("<option>", {value: semester.id, text: semester.name}));
@@ -68,38 +75,71 @@ function setupSidebar(nodeSelectedCb, stepCb, finishedCb) {
 				loadFacultiesInTree();
 			}
 
-			var facIndex = 0;
-			function nextFaculty() {
-				var fac = semester.faculties[facIndex++];
-				semesterData[semester.id].lastFaculty = fac;
-				if (!fac) {
-					semesterData[semester.id].loaded = true;
-					nextSemester();
-					return;
-				}
-				$.get("/data/courses", {semesterId: semester.id, facultyName: fac}, function (data) {
-					if (!data) return;
-					semesterData[semester.id].data[fac] = data;
-					console.log(semester.id);
-					if(semester.id == currentSemester) {
-						loadFacultyData(fac);
-						tree.expand();
-					}
-					if (stepCb) stepCb(fac);
-					nextFaculty();
-				});
-			}
-			nextFaculty();
+			nextFaculty(0, semester.faculties, semester.id, true, stepCb, nextSemester);
 		}
 		nextSemester();
+	});
+}
+
+function nextFaculty(facIndex, faculties, semesterId, bySemester, stepCb, cb) {
+	var fac = faculties[facIndex];
+	semesterData[semesterId].lastFaculty = fac;
+	if (!fac) {
+		semesterData[semesterId].loaded = true;
+		if(cb) cb();
+		return;
+	}
+	var query = { facultyName: fac };
+	if(bySemester) query.semesterId = semesterId;
+	$.get("/data/courses", query, function (res) {
+		if (!res || !res.ok) return;
+
+		semesterData[semesterId].data[fac] = res.courses;
+		console.log(semesterId);
+		if(semesterId == currentSemester) {
+			loadFacultyData(fac);
+			tree.expand();
+		}
+		if (stepCb) stepCb(fac);
+		nextFaculty(facIndex + 1, faculties, semesterId, bySemester, stepCb, cb);
+	});
+}
+
+function loadAll(stepCb, finishedCb) {
+	$("#semester-selector-container").addClass("hidden");
+	$.get("/data/faculties", function(res) {
+		if (!res || !res.ok) return;
+		var faculties = res.faculties;
+		console.log(faculties);
+
+		var semesterId = "ALL_COURSES";
+		semesterData[semesterId] = {
+			data: {},
+			loaded: false,
+			lastFaculty: undefined
+		};
+
+		for (var i = 0; i < faculties.length; i++) {
+			var faculty = faculties[i];
+			semesterData[semesterId].data[faculty] = {};
+		}
+
+		currentSemester = semesterId;
+		courseData = semesterData[currentSemester].data;
+		loadFacultiesInTree();
+
+		nextFaculty(0, faculties, semesterId, false, stepCb, finishedCb);
 	});
 }
 
 function setupSemesterSelector() {
 	// TODO: Cancel current loading semester to load this semester
 	// TODO: Add query to URL
-	$("#semester_selector").change(function() {
-		currentSemester = $(this).val();
+	$("#semester-selector").change(function() {
+		var newSemester = $(this).val();
+		if(newSemester == currentSemester) return;
+
+		currentSemester = newSemester;
 		console.log(currentSemester);
 		if(!semesterData[currentSemester]) {
 			semesterData[currentSemester] = {

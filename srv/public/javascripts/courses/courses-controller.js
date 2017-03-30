@@ -6,7 +6,7 @@ $(document).ready(function () {
 	$content = $("#content");
 
 	urlChanged();
-	setupSidebar(nodeSelected, function(faculty) {
+	setupSidebar(false, nodeSelected, function(faculty) {
 		loadContent(faculty);
 	});
 

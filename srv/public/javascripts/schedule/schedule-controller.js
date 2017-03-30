@@ -1,5 +1,5 @@
 $(document).ready(function () {
-	setupSidebar(SelectCourse);
+	setupSidebar(true, SelectCourse);
 });
 
 var selected = {};
@@ -13,7 +13,7 @@ function SelectCourse(node) {
 
 	if(node.type != "course") return;
 	var data = node.data;
-	var id = data.dept_name + data.number;
+	var id = data.dept_name + " " + data.number;
 	if(selected[id]) return;
 
 	if(selectedCount++ == 0) {
