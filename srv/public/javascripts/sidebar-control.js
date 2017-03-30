@@ -38,8 +38,9 @@ function setupSidebar(bySemesters, nodeSelectedCb, stepCb, finishedCb) {
 function loadBySemesters(stepCb, finishedCb) {
 	setupSemesterSelector();
 	// TODO: Read the semester query from the URL
-	$.get("/data/semesters", function(res) {
+	$.get("/data/semesters", { combined: true }, function(res) {
 		if(!res || !res.ok) return;
+		console.log(res);
 		var semesters = res.semesters;
 
 		var $selector = $("#semester-selector");
@@ -81,36 +82,13 @@ function loadBySemesters(stepCb, finishedCb) {
 	});
 }
 
-function nextFaculty(facIndex, faculties, semesterId, bySemester, stepCb, cb) {
-	var fac = faculties[facIndex];
-	semesterData[semesterId].lastFaculty = fac;
-	if (!fac) {
-		semesterData[semesterId].loaded = true;
-		if(cb) cb();
-		return;
-	}
-	var query = { facultyName: fac };
-	if(bySemester) query.semesterId = semesterId;
-	$.get("/data/courses", query, function (res) {
-		if (!res || !res.ok) return;
-
-		semesterData[semesterId].data[fac] = res.courses;
-		console.log(semesterId);
-		if(semesterId == currentSemester) {
-			loadFacultyData(fac);
-			tree.expand();
-		}
-		if (stepCb) stepCb(fac);
-		nextFaculty(facIndex + 1, faculties, semesterId, bySemester, stepCb, cb);
-	});
-}
-
 function loadAll(stepCb, finishedCb) {
 	$("#semester-selector-container").addClass("hidden");
-	$.get("/data/faculties", function(res) {
+	$.get("/data/semesters", { combined: false }, function(res) {
 		if (!res || !res.ok) return;
+		// TODO: Use res.semesters
+		console.log(res);
 		var faculties = res.faculties;
-		console.log(faculties);
 
 		var semesterId = "ALL_COURSES";
 		semesterData[semesterId] = {
@@ -129,6 +107,30 @@ function loadAll(stepCb, finishedCb) {
 		loadFacultiesInTree();
 
 		nextFaculty(0, faculties, semesterId, false, stepCb, finishedCb);
+	});
+}
+
+function nextFaculty(facIndex, faculties, semesterId, bySemester, stepCb, cb) {
+	var fac = faculties[facIndex];
+	semesterData[semesterId].lastFaculty = fac;
+	if (!fac) {
+		semesterData[semesterId].loaded = true;
+		if(cb) cb();
+		return;
+	}
+	var query = { facultyName: fac };
+	if(bySemester) query.semesterId = semesterId;
+	$.get("/data/courses", query, function (res) {
+		if (!res || !res.ok) return;
+
+		console.log(res.courses);
+		semesterData[semesterId].data[fac] = res.courses;
+		if(semesterId == currentSemester) {
+			loadFacultyData(fac);
+			tree.expand();
+		}
+		if (stepCb) stepCb(fac);
+		nextFaculty(facIndex + 1, faculties, semesterId, bySemester, stepCb, cb);
 	});
 }
 

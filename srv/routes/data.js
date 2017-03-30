@@ -23,73 +23,86 @@ function error(msg, val) {
 	};
 }
 
-function success(dataName, data) {
-	var res = {
-		ok: true
-	};
-	res[dataName] = data;
-	return res;
+function success(data) {
+	data.ok = true;
+	return data;
 }
 
 router.get('/semesters', function(req, res) {
 	var client = new Client(config);
 	client.connect();
 
-	var q = escape("SELECT s.*, f.name as fac_name FROM faculty as f, faculty_contains as fc, course_section as c, semester as s WHERE " +
-		"c.semester_id=s.id AND c.dept_name=fc.dept_name AND f.name=fc.faculty_name GROUP BY s.id, f.name");
+	var combined = req.query.combined === "true";
+
+	var q;
+	if(combined) {
+		q = escape("SELECT s.*, f.name as fac_name FROM faculty as f, faculty_contains as fc, course_section as c, semester as s WHERE " +
+			"c.semester_id=s.id AND c.dept_name=fc.dept_name AND f.name=fc.faculty_name GROUP BY s.id, f.name");
+	} else {
+		q = escape("SELECT s.* FROM semester as s");
+	}
+
 	console.log(q);
 	client.query(q, function(err, result) {
-		client.end();
 		if(err) {
 			console.log(err);
 			res.send(error(DB_ERROR));
 			return;
 		}
 
-		var semesters = {};
-		for (var i = 0; i < result.rows.length; i++) {
-			var obj = result.rows[i];
-			if(!semesters[obj.id]) {
-				semesters[obj.id] = {
-					id: obj.id,
-					name: obj.name,
-					faculties: []
-				};
+		if(combined) {
+			client.end();
+
+			var semesters = {};
+			for (var i = 0; i < result.rows.length; i++) {
+				var obj = result.rows[i];
+				if (!semesters[obj.id]) {
+					semesters[obj.id] = {
+						id: obj.id,
+						name: obj.name,
+						faculties: []
+					};
+				}
+				semesters[obj.id].faculties.push(obj.fac_name);
+				semesters[obj.id].faculties.sort();
 			}
-			semesters[obj.id].faculties.push(obj.fac_name);
-			semesters[obj.id].faculties.sort();
+
+			var list = [];
+			for (var id in semesters) {
+				if (!semesters.hasOwnProperty(id)) continue;
+				list.push(semesters[id]);
+			}
+
+			res.send(success({
+				semesters: list
+			}));
+		} else {
+			var semesterList = [];
+			for(var j = 0; j < result.rows.length; j++) {
+				semesterList.push(result.rows[j]);
+			}
+
+			var q = escape("SELECT f.* FROM faculty as f");
+			console.log(q);
+			client.query(q, function(err, result) {
+				client.end();
+				if(err) {
+					console.log(err);
+					res.send(error(DB_ERROR));
+					return;
+				}
+
+				var facultyList = [];
+				for(var i = 0; i < result.rows.length; i++) {
+					facultyList.push(result.rows[i].name);
+				}
+
+				res.send(success({
+					semesters: semesterList,
+					faculties: facultyList
+				}));
+			});
 		}
-
-		var list = [];
-		for (var id in semesters) {
-			if(!semesters.hasOwnProperty(id)) continue;
-			list.push(semesters[id]);
-		}
-
-		res.send(success("semesters", list));
-	});
-});
-
-router.get('/faculties', function(req, res) {
-	var client = new Client(config);
-	client.connect();
-
-	var q = escape("SELECT f.* FROM faculty as f");
-	console.log(q);
-	client.query(q, function(err, result) {
-		client.end();
-		if(err) {
-			console.log(err);
-			res.send(error(DB_ERROR));
-			return;
-		}
-
-		var list = [];
-		for(var i = 0; i < result.rows.length; i++) {
-			list.push(result.rows[i].name);
-		}
-
-		res.send(success("faculties", list));
 	});
 });
 
@@ -145,7 +158,8 @@ router.get('/courses', function(req, res) {
 					fac_name: obj.fac_name,
 					name: obj.name,
 					number: obj.course_num,
-					sections: []
+					sections: [],
+					semesters: []
 				};
 			}
 			parent = parent[obj.number];
@@ -156,11 +170,18 @@ router.get('/courses', function(req, res) {
 				time: obj.time,
 				location: obj.location,
 				section_id: obj.id,
-				instr_name: obj.ta_name || obj.instr_name
+				instr_name: obj.ta_name || obj.instr_name,
+				semester_id: obj.semester_id
 			});
+
+			if(!parent.semesters.includes(obj.semester_id)) {
+				parent.semesters.push(obj.semester_id);
+			}
 		}
 
-		res.send(success("courses", courseData));
+		res.send(success({
+			courses: courseData
+		}));
 	});
 });
 

@@ -30,7 +30,7 @@ function scrapeSemesters() {
 				if(data[index]) {
 					var term = data[index++].$;
 					console.log(term);
-					if(term.desc == "Fall 2017") {
+					if(term.desc == "Fall 2017" || term.desc == "Winter 2018") {
 						semesterId = term.name;
 						saveSemester(term, function () {
 							scrapeSemester(term.name, each);
