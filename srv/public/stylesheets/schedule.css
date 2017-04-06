@@ -23,7 +23,10 @@
   height: 10%;
   width: 10%;
   margin-bottom: 0;
-  position: absolute; }
+  position: absolute;
+  background-color: #009688;
+  color: #FFFFFF;
+  text-align: center; }
 
 table, th, tr {
   border: 1px solid black;

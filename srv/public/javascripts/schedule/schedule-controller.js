@@ -74,7 +74,8 @@ function SelectCourse(node) {
 			e.preventDefault();
 			//TODO: Add course to schedule
 			var $classOverlay = $("<div>", {
-				class: "class-overlay"
+				class: "class-overlay",
+				text: data.sections[$(this).attr("data-index")].time
 			});
 			console.log(data.sections[$(this).attr("data-index")].time);
 
@@ -86,14 +87,19 @@ function SelectCourse(node) {
 			var temp = $("#"+day).position();
 			var temp2 = $("#"+time).position();
 
-			var width = $("#"+day).parent().parent().width();
-			var height = $("#"+day).parent().parent().height() + $("#"+day).height();
+			var height = $("#"+day).parent().height();
+			var width = $("#"+day).width();
+
+			var twidth = $("#"+day).parent().parent().width();
+			var theight = $("#"+day).parent().parent().height();
 
 			console.log(height);
 
 			$classOverlay.css({
-				top: temp2.top/height*100 + "%", 
-				left: temp.left/width*100 + "%"
+				top: temp2.top/theight*100 - 6.4 + "%", 
+				left: temp.left/twidth*100 + 0.25 + "%",
+				height: "6.4%",
+				width: "12.25%"
 			});
 
 			$("table").append($classOverlay);
