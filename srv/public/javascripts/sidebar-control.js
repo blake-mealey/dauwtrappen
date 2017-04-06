@@ -42,7 +42,7 @@ function loadBySemesters(stepCb, finishedCb) {
 	// TODO: Read the semester query from the URL
 	$.get("/data/semesters", { combined: true }, function(res) {
 		if(!res || !res.ok) return;
-		console.log(res);
+		// console.log(res);
 		var semesters = res.semesters;
 
 		var $selector = $("#semester-selector");
@@ -129,7 +129,7 @@ function nextFaculty(facIndex, faculties, semesterId, bySemester, stepCb, cb) {
 	$.get("/data/courses", query, function (res) {
 		if (!res || !res.ok) return;
 
-		console.log(res.courses);
+		// console.log(res.courses);
 		semesterData[semesterId].data[fac] = res.courses;
 		if(semesterId == currentSemester) {
 			loadFacultyData(fac);
