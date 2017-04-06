@@ -11,7 +11,7 @@ var config = {
 var client;
 
 var endCount = 0;
-var queryCount = 16*2;
+var queryCount = 17*2;
 
 function end(force) {
 	if(++endCount >= queryCount || force) {
@@ -95,6 +95,16 @@ new pg.Pool(config).connect(function (err, c) {
 		"dept_name VARCHAR(4) NOT NULL," +
 		"FOREIGN KEY (dept_name) REFERENCES department(name) ON DELETE CASCADE ON UPDATE CASCADE," +
 		"PRIMARY KEY (dept_name, number)" +
+		")");
+
+	query("DROP TABLE IF EXISTS prerequisite CASCADE");
+	query("CREATE TABLE prerequisite(" +
+		"course_num text NOT NULL," +
+		"course_dept VARCHAR(4) NOT NULL," +
+		"prereq_num TEXT NOT NULL," +
+		"prereq_dept VARCHAR(4) NOT NULL," +
+		"FOREIGN KEY (course_dept, course_num) REFERENCES course(dept_name, number) ON DELETE CASCADE ON UPDATE CASCADE," +
+		"FOREIGN KEY (prereq_dept, prereq_num) REFERENCES course(dept_name, number) ON DELETE CASCADE ON UPDATE CASCADE" +
 		")");
 
 	query("DROP TYPE IF EXISTS section_type CASCADE");
