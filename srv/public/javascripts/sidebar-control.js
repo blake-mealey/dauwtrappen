@@ -1,10 +1,12 @@
 var semesterData;
+var semesterNames;
 var currentSemester;
 var courseData;
 var tree;
 
 function setupSidebar(bySemesters, nodeSelectedCb, stepCb, finishedCb) {
 	semesterData = {};
+	semesterNames = {};
 
 	tree = new InspireTree({
 		target: '#courses-list',
@@ -59,6 +61,7 @@ function loadBySemesters(stepCb, finishedCb) {
 
 			// TODO: Load the current semester first.
 
+			semesterNames[semester.id] = semester.name;
 			semesterData[semester.id] = {
 				data: {},
 				loaded: false,
@@ -86,8 +89,11 @@ function loadAll(stepCb, finishedCb) {
 	$("#semester-selector-container").addClass("hidden");
 	$.get("/data/semesters", { combined: false }, function(res) {
 		if (!res || !res.ok) return;
-		// TODO: Use res.semesters
-		console.log(res);
+		for(var j = 0; j < res.semesters.length; j++) {
+			var semester = res.semesters[j];
+			semesterNames[semester.id] = semester.name;
+		}
+
 		var faculties = res.faculties;
 
 		var semesterId = "ALL_COURSES";
