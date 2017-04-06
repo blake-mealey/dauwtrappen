@@ -1,14 +1,11 @@
-@import "_colors"
-@import "_shadows"
+@import "_cards"
 
 .class-overlay
-  background-color: $card-background-color
-  padding: 1em
+  @extend .card
+  padding: 0
   top: 0
   left: 0
   height: 10%
   width: 10%
-  margin-bottom: 1em
-  border-radius: 2px
+  margin-bottom: 0
   position: absolute
-  +card-shadow

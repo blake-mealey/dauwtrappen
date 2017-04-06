@@ -17,12 +17,13 @@ block body
 
 
 block center
-	table
+	table(style="position: relative;")
 		tr
 			each val2 in ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-				th= val2
+				- val2 != "" ? val3 = val2.substring(0,3) : val3 = "";
+				th(id=val3)= val2
 		- for (var i = 6; i <= 19; i++) 
-			tr
+			tr(id=i)
 				each val2 in [1, 2, 3, 4, 5, 6, 7, 8]
 					if val2 == 1
 						th= (i % 12 + 1 + ":00 " + (i > 10 ? "PM" : "AM"))

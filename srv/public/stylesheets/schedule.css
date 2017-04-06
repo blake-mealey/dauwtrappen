@@ -1,4 +1,13 @@
-.card {
+.card, .class-overlay {
+  background-color: #FFFFFF;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 2px;
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
+
+.card, .class-overlay {
   background-color: #FFFFFF;
   padding: 1em;
   margin-bottom: 1em;
@@ -8,18 +17,13 @@
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
 .class-overlay {
-  background-color: #FFFFFF;
-  padding: 1em;
+  padding: 0;
   top: 0;
   left: 0;
   height: 10%;
   width: 10%;
-  margin-bottom: 1em;
-  border-radius: 2px;
-  position: absolute;
-  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
+  margin-bottom: 0;
+  position: absolute; }
 
 table, th, tr {
   border: 1px solid black;
@@ -41,13 +45,13 @@ tr, th {
   background: black;
   margin-bottom: 10px; }
 
-#selected-courses .card {
+#selected-courses .card, #selected-courses .class-overlay {
   position: relative; }
-  #selected-courses .card p {
+  #selected-courses .card p, #selected-courses .class-overlay p {
     margin: 0; }
-  #selected-courses .card h5 {
+  #selected-courses .card h5, #selected-courses .class-overlay h5 {
     margin: 0 0 10px 0; }
-  #selected-courses .card .close-button {
+  #selected-courses .card .close-button, #selected-courses .class-overlay .close-button {
     position: absolute;
     top: 5px;
     right: 5px; }

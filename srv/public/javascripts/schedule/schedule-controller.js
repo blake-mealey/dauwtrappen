@@ -66,16 +66,39 @@ function SelectCourse(node) {
 		var $p = $("<p>");
 		var $a = $("<a>", {
 			text: section.type + ": " + section.time,
-			href: ""
+			href: "",
+			"data-index": i
 		});
+
 		$a.click(function(e) {
 			e.preventDefault();
-			var $card2 = $("<div>", {
+			//TODO: Add course to schedule
+			var $classOverlay = $("<div>", {
 				class: "class-overlay"
 			});
-			console.log(data.sections[i].time);
-			$("table").append($card2);
+			console.log(data.sections[$(this).attr("data-index")].time);
+
+			var time = data.sections[$(this).attr("data-index")].time;
+			var day = time.substring(0, 3);
+			time = time.substring(3);
+			time = time.split(":")[0];
+
+			var temp = $("#"+day).position();
+			var temp2 = $("#"+time).position();
+
+			var width = $("#"+day).parent().parent().width();
+			var height = $("#"+day).parent().parent().height() + $("#"+day).height();
+
+			console.log(height);
+
+			$classOverlay.css({
+				top: temp2.top/height*100 + "%", 
+				left: temp.left/width*100 + "%"
+			});
+
+			$("table").append($classOverlay);
 		});
+
 		$p.append($a);
 		$card.append($p);
 	}
