@@ -70,7 +70,11 @@ function SelectCourse(node) {
 		});
 		$a.click(function(e) {
 			e.preventDefault();
-			// TODO: add to table
+			var $card2 = $("<div>", {
+				class: "class-overlay"
+			});
+			console.log(data.sections[i].time);
+			$("table").append($card2);
 		});
 		$p.append($a);
 		$card.append($p);

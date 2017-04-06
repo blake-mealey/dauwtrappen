@@ -174,7 +174,7 @@ router.get('/courses', function(req, res) {
 				semester_id: obj.semester_id
 			});
 
-			if(!parent.semesters.includes(obj.semester_id)) {
+			if(parent.semesters.indexOf(obj.semester_id) != -1) {
 				parent.semesters.push(obj.semester_id);
 			}
 		}
