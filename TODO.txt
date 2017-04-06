@@ -1,0 +1,34 @@
+TODO:
+
+For hand-in Final Report:
+
+Update the ER diagram. (RE-add from presentation, Recursive relationship of pre-reqs)
+Relationship Schema-Diagram.
+
+
+Paper-esk:
+  Abstract: < 300 words.
+  Intro: Describe problem, and your solution to the problem.
+  Project-design: Discuss the different users, (Complete transaction, -> Complete picture of the functionality offered by system)
+    -Also: A thorough ER, Every component present, visible and legible. Any changes made since should be indicated.
+    -Relational Schema Diagram: Via the silly algoirthm he has. Discuss decisions you had to make.
+    -Describe the DBMS you selected. Also includes the SQL statements for each of the transactions. //YAY WE USED SQL. LIFE IS GREAT.
+    -A user interface section should present a brief description of your interface design, including server screenshots.
+
+Demo:
+  -Describe the scenario and system details.
+  -Well-designed? Well-presented?
+  -Basic Requirements?
+  -UI good?
+  -Were the queries presented?
+  -Question participation.
+
+
+
+3-End users: updated in ppt.
+  Login
+  Schedulers
+  Courses
+
+
+
