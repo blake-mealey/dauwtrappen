@@ -129,7 +129,7 @@ router.get('/courses', function(req, res) {
 			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
 			req.query.facultyName);
 	}
-
+	console.log(q);
 	client.query(q, function (err, result) {
 		client.end();
 		if(err) {
@@ -162,7 +162,7 @@ router.get('/courses', function(req, res) {
 					semesters: []
 				};
 			}
-			parent = parent[obj.number];
+			parent = parent[obj.course_num];
 
 			parent.sections.push({
 				section_number: obj.number,

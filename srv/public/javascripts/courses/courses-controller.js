@@ -217,7 +217,19 @@ function displayCourse(course, $parent) {
 
 	createLinkHeader($course, "<h4>", course.number + ": " + course.name, "/courses/" + course.fac_name + "/" + course.dept_name + "/" + course.number);
 
-	$course.append($("<p>", {text: course.description}));
+	$course.append($("<p>", { text: course.description }));
+
+	var offeredText;
+	if(course.semesters.length == 0) {
+		offeredText = "Not currently offered."
+	} else {
+		offeredText = "Offered in: ";
+		for (var i = 0; i < course.semesters.length; i++) {
+			offeredText += semesterNames[course.semesters[i]] + ((i != course.semesters.length - 1) ? ", " : "");
+		}
+	}
+	$course.append($("<b>", { text: offeredText }));
+
 	$parent.append($course);
 }
 
