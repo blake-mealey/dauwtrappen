@@ -5,6 +5,8 @@ $(document).ready(function () {
 var selected = {};
 var selectedCount = 0;
 
+var daysToNum = {"Mon": 1, "Tue": 2, "Wed": 3,"Thu": 4,"Fri": 5,"Sat": 6,"Sun": 7};
+
 function SelectCourse(node) {
 
 	// Node contains all of the information pertaining to the courses secions
@@ -81,25 +83,28 @@ function SelectCourse(node) {
 
 			var time = data.sections[$(this).attr("data-index")].time;
 			var day = time.substring(0, 3);
+
+			//Remove the day from the time
 			time = time.substring(3);
-			time = time.split(":")[0];
+			var timeArr = time.split("-");
+			var timeL = timeArr[0];
+			var timeR = timeArr[1];
 
-			var temp = $("#"+day).position();
-			var temp2 = $("#"+time).position();
+			var startHour = Number(timeL.split(":")[0].trim());
+			var startMinute = Number(timeL.split(":")[1].trim());
+			timeL = startHour*60 + startMinute;
+			timeR = Number(timeR.split(":")[0].trim())*60 + Number(timeR.split(":")[1].trim());
 
-			var height = $("#"+day).parent().height();
-			var width = $("#"+day).width();
+			//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
+			var scale = (timeR - timeL) / 60;
+			var top = ((startHour - 6) * 6.666) + (6.666 * startMinute/60) * 100;
 
-			var twidth = $("#"+day).parent().parent().width();
-			var theight = $("#"+day).parent().parent().height();
-
-			console.log(height);
 
 			$classOverlay.css({
-				top: temp2.top/theight*100 - 6.4 + "%", 
-				left: temp.left/twidth*100 + 0.25 + "%",
-				height: "6.4%",
-				width: "12.25%"
+				top: top + "%", 
+				left: (daysToNum[day])/8 * 100 + 0.25 + "%",
+				height: 6.66*scale + "%",
+				width: "12%"
 			});
 
 			$("table").append($classOverlay);
