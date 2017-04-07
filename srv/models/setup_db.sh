@@ -6,6 +6,9 @@ if [ -e ./setu_db.sh ]; then
   exit
 fi
 
-node database.js
-#node sample-data.js
+# node database.js
+export PGPASSWORD=carrots
+psql ddn_db postgres < database.sql
+
+# node sample-data.js
 node dndn-scraper.js
