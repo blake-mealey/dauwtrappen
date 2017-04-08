@@ -36,6 +36,13 @@ function SelectCourse(node) {
 	});
 	$close.click(function() {
 		$card.remove();
+
+		for (var overlay in selected[id].overlays) {
+			if (!selected[id].overlays.hasOwnProperty(overlay)) continue;
+			
+			selected[id].overlays[overlay].remove();
+		}
+
 		selected[id] = undefined;
 		if(--selectedCount == 0) {
 			$("#get-started").removeClass("hidden");
@@ -74,14 +81,17 @@ function SelectCourse(node) {
 
 		$a.click(function(e) {
 			e.preventDefault();
-			//TODO: Add course to schedule
+
+			var index = $(this).attr("data-index");
+
+			if (selected[id].overlays[index]) return;
+
 			var $classOverlay = $("<div>", {
 				class: "class-overlay",
-				text: data.sections[$(this).attr("data-index")].time
+				text: data.sections[index].time
 			});
-			console.log(data.sections[$(this).attr("data-index")].time);
 
-			var time = data.sections[$(this).attr("data-index")].time;
+			var time = data.sections[index].time;
 			var day = time.substring(0, 3);
 
 			//Remove the day from the time
@@ -108,6 +118,8 @@ function SelectCourse(node) {
 			});
 
 			$("table").append($classOverlay);
+
+			selected[id].overlays[index] = $classOverlay; 
 		});
 
 		$p.append($a);
@@ -115,5 +127,8 @@ function SelectCourse(node) {
 	}
 
 	$("#selected-courses").append($card);
-	selected[id] = $card;
+	selected[id] = {
+		card: $card,
+		overlays: {}
+	};
 }
