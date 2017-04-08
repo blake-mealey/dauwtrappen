@@ -1,4 +1,4 @@
-.card, .class-overlay {
+.card, #popup-style, .class-overlay {
   background-color: #FFFFFF;
   padding: 1em;
   margin-bottom: 1em;
@@ -7,7 +7,26 @@
   -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
-.card, .class-overlay {
+.card, #popup-style, .class-overlay {
+  background-color: #FFFFFF;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 2px;
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
+
+#popup-style {
+  padding: 10px;
+  margin-bottom: 0;
+  position: absolute;
+  z-index: 2;
+  text-align: center; }
+  #popup-style button {
+    margin-left: 5px;
+    margin-right: 5px; }
+
+.card, #popup-style, .class-overlay {
   background-color: #FFFFFF;
   padding: 1em;
   margin-bottom: 1em;
@@ -48,13 +67,13 @@ tr, th {
   background: black;
   margin-bottom: 10px; }
 
-#selected-courses .card, #selected-courses .class-overlay {
+#selected-courses .card, #selected-courses #popup-style, #selected-courses .class-overlay {
   position: relative; }
-  #selected-courses .card p, #selected-courses .class-overlay p {
+  #selected-courses .card p, #selected-courses #popup-style p, #selected-courses .class-overlay p {
     margin: 0; }
-  #selected-courses .card h5, #selected-courses .class-overlay h5 {
+  #selected-courses .card h5, #selected-courses #popup-style h5, #selected-courses .class-overlay h5 {
     margin: 0 0 10px 0; }
-  #selected-courses .card .close-button, #selected-courses .class-overlay .close-button {
+  #selected-courses .card .close-button, #selected-courses #popup-style .close-button, #selected-courses .class-overlay .close-button {
     position: absolute;
     top: 5px;
     right: 5px; }

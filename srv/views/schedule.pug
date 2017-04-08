@@ -12,9 +12,20 @@ block head
 block body
 	include includes/sidebar
 	.ui-layout-east
+		button#save-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", style={width: "45%", height: "40px", "margin-right": "2.5%", "margin-left": "2.5%"}) Save
+		button#load-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", style={width: "45%", height: "40px", "margin-right": "2.5%", "margin-left": "2.5%"}) Load
+
+		p 
 		h4#get-started Select some courses to get started!
 		#selected-courses
 
+	#popup-style.hidden
+		form(action="#")
+			div#name-input-cont(class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label")
+				input(class="mdl-textfield__input" type="text" id="name-input")
+				label(class="mdl-textfield__label", for="name-input") Schedule Name
+		button#final-save-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect") Save
+		button#cancel-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect") Cancel
 
 block center
 	table(style="position: relative;")
@@ -29,5 +40,5 @@ block center
 						th= (i % 12 + 1 + ":00 " + (i > 10 ? "PM" : "AM"))
 					else
 						th
-		
+
 			

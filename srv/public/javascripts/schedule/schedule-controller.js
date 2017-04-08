@@ -1,8 +1,68 @@
 $(document).ready(function () {
 	setupSidebar(true, SelectCourse);
+
+	$("#save-btn").click(function() {
+		//Implement some sort of save feature
+		var $overlay = $("<div>", {
+			id: "dark-overlay",
+			style: "width: 100%; height: 100%; background-color: #000000; opacity: 0.5;"
+		});
+		
+
+		// Hack to get rid of panel resizers
+    	$(".ui-layout-resizer").hide();
+
+		$(":root").append($overlay);
+		$("#popup-style").removeClass("hidden");
+
+		var temp = $("#popup-style").width();
+		var temp2 = $("#popup-style").height();
+
+		$("#popup-style").css({
+			left: "calc(50% - " + temp/2 + "px)",
+			top: "calc(50% - " + temp2/2 + "px)"
+		});
+	});
+
+	$("#cancel-btn").click(function() {
+		$("#name-input").val("");
+		$("#name-input-cont").removeClass("is-dirty");
+		$("#name-input-cont").removeClass("is-focused");
+		//Show everthing like normal
+		$(".ui-layout-resizer").show();
+		$("#dark-overlay").remove();
+		$("#popup-style").addClass("hidden");
+	});
+
+	$("#final-save-btn").click(function() {
+		//Firstly we need to save everything
+		var req = {
+			scheduleName: $("#name-input").val(),
+			sections: selectedSections
+		}
+		console.log(req);
+		$.post("/data/saveSchedule", req, function(res) {
+			console.log(res);
+			//Then we need to reset everything
+			$("#name-input").val("");
+			$("#name-input-cont").removeClass("is-dirty");
+			$("#name-input-cont").removeClass("is-focused");
+			//Show everything as normal
+			$(".ui-layout-resizer").show();
+			$("#dark-overlay").remove();
+			$("#popup-style").addClass("hidden");
+		});
+	});
+
+	$("#load-btn").click(function() {
+		console.log("Clicked load");
+		//Implement some sort of load feature
+		//Should popup a windows with a list of schedules that the user can select from
+	});
 });
 
 var selected = {};
+var selectedSections = [];
 var selectedCount = 0;
 
 var daysToNum = {"Mon": 1, "Tue": 2, "Wed": 3,"Thu": 4,"Fri": 5,"Sat": 6,"Sun": 7};
@@ -39,7 +99,6 @@ function SelectCourse(node) {
 
 		for (var overlay in selected[id].overlays) {
 			if (!selected[id].overlays.hasOwnProperty(overlay)) continue;
-			
 			selected[id].overlays[overlay].remove();
 		}
 
@@ -47,7 +106,6 @@ function SelectCourse(node) {
 		if(--selectedCount == 0) {
 			$("#get-started").removeClass("hidden");
 		}
-		//TODO: remove from table
 	});
 	var $i = $("<i>", {
 		class: "material-icons",
@@ -71,6 +129,7 @@ function SelectCourse(node) {
 	);
 
 	for(var i = 0; i < data.sections.length; i++) {
+		console.log(data.sections[i]);
 		var section = data.sections[i];
 		var $p = $("<p>");
 		var $a = $("<a>", {
@@ -88,8 +147,9 @@ function SelectCourse(node) {
 
 			var $classOverlay = $("<div>", {
 				class: "class-overlay",
-				text: data.sections[index].time
+				text: data.sections[index].time,
 			});
+			selectedSections.push(data.sections[index].section_id);
 
 			var time = data.sections[index].time;
 			var day = time.substring(0, 3);
@@ -108,7 +168,6 @@ function SelectCourse(node) {
 			//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
 			var scale = (timeR - timeL) / 60;
 			var top = ((startHour - 6) * 6.666) + (6.666 * startMinute/60) * 100;
-
 
 			$classOverlay.css({
 				top: top + "%", 

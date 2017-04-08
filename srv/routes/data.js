@@ -317,6 +317,61 @@ router.get('/createAccount', function(req, res) {
 });
 //END:  Function for assisting in account creation
 
+router.post('/saveSchedule', function (req, res) {
+	console.log(req.body);
+
+	if(!req.body.scheduleName) {
+		res.send(error(ARG_MISSING, "SCHEDULE_NAME"));
+		return;
+	}
+
+	if(!req.body["sections[]"]) {
+		res.send(error(ARG_MISSING, "SECTIONS"));
+		return;
+	}
+
+	req.body.sections = req.body["sections[]"];
+
+	var client = new Client(config);
+	client.connect();
+	console.log(req.body);
+
+	//START: creates query and gets results
+	var q = escape("INSERT INTO schedule " +
+		"VALUES ('1',%L,'DESCRIPTION','blake@ben.com')",
+		req.body.scheduleName);
+	client.query(q, function (err, result) {
+		if(err) {
+			console.log(err);
+			res.send(error(DB_ERROR));
+			return;
+		}
+
+		var index = 0;
+		function each() {
+			var element = req.body.sections[index++];
+			if(!element) {
+				client.end();
+				res.send(success({}));
+				return;
+			}
+
+			var q = escape("INSERT INTO schedule_section " +
+				"VALUES ('1',%s)",
+				element);
+			client.query(q, function(err, result) {
+				if(err) {
+					console.log(err);
+					res.send(error(DB_ERROR));
+					return;
+				}
+
+				each();
+			});
+		}
+		each();
+	});
+});
 
 
 
