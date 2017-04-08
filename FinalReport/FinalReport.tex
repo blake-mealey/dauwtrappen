@@ -75,7 +75,7 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 \\
 \linia\\
 \@author \hfill \@date
-\vspace{4ex}
+\vspace{-1ex}
 \end{center}
 }
 \makeatother
@@ -115,7 +115,7 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 
 \section*{Abstract}
 
-The existing tools for planning semester schedules are decentralized, making them difficult to use together. The goal with this project was to simplify the semester planning process by creating a single tool that encompassed the functionality of the UofC calendar, myUofC course search, degree navigator, and the UofC schedule builder. While we managed to implement most of the desired functionality, we did not implement the degree navigator.
+The current process for creating a class schedule is to go through many periferal websites to acquire all the information needed to make a logical decision in semester schedule building. This process is distrupted with the introduction of the Dauwtrappen Website, which allows you to get all the required information, and create a schedule, in one internet browser tab.
 
 \section*{Introduction}
 
@@ -137,33 +137,31 @@ A login system was started, from which users can be added to the database using 
 
 \begin{enumerate}
 	\item Course Browsing
-	A user interested in courses offered by the University of Calgary can navigate to the Dauwtrappen website. Once on the website, a series of SQL queries are executed which load the entire course list. These queries are executed in alphabetical order by department so that the user can begin interacting with the system before all of the data is loaded.
-	Once some or all of the course data is loaded, the user can either browse through the courses using the course tree or perform a search for preferred courses by department, course numbers, and course names. Courses that fulfill their selection/search criteria display the corresponding course information such as their name and number, description, prerequisites, and when/whether they are offered.
 
-	A user would use the Dauwtrappen website as opposed to the UofC Calender website for 3 reasons, some of which have already been mentioned:
+	A user interested in courses offered by the University of Calgary can navigate to the Dauwtrappen website. Once on the website, a series of SQL queries are executed which load the entire course list. These queries are executed in alphabetical order, by faculty, so that the user can begin interacting with the system before all of the data is loaded.
+	Once some or all of the course data is loaded, the user can either browse through the courses using the course tree or perform a search for preferred courses by department, course numbers, and course names. Courses that fulfill their selection/search criteria display the corresponding course information such as their name, number, description, prerequisites, and when/whether they are offered.
+
+	A user would use the Dauwtrappen website, as opposed to the other course viewing websites, for the following three reasons:
 	Firstly, the intuitive search tool.
-	Secondly, the UofC Calender only mentions if courses are offered in even/odd years, but does not state which semester the courses will actually be offered in, whereas the Dauwtrappen course list does just that.
-	Thirdly, the overall integration of all aspects of the Dauwtrappen website.
+	Secondly, the Dauwtrappen website has information about when courses are offered alongside the course descriptions.
+	Thirdly, the overall integration of all aspects of the Dauwtrappen website, namely the schedule builder alongside the course viewer.
 
 	\item Schedule Building
-	A student or perspective student can navigate to the schedule building page of the website in order to get organized for the upcoming semester. Again, a series of SQL queries are executing which loads the course data in a cascading fashion. The user can browse through the list or use the same search tool that is present in the course selection. 
-	The user can then click on a course to add it to the selected courses panel on the right side of the screen. This panel will then display the various lectures, tutorials, and labs available for that course, as well as their corresponding times. The user can individually click on these sections to add them to their schedule. To remove a selected course, the user can click the little X button on the course. This will remove it from the selected course panel and any selected sections will be removed from the schedule itself. 
-	Once the user completes their schedule, they can click the save button to save their schedule to the database. They can give it a name if they wish, but this is not required.
+	
+	A student, or perspective student, can navigate to the schedule building page of the Dauwtrappen website to get organized for the upcoming semester. Again, a series of SQL queries are executed, loading the course data in a cascading fashion. The user can browse through the list or use the same search tool that is present in the course selection. 
+	The user can then click on a course to add it to the selected courses sidebar,located on the right side of the screen. This sidebar will then display the various lectures, tutorials, and labs available for that course, as well as their corresponding times. The user can individually click on these sections to add them to their schedule. To remove a selected course, the user can click the X button on that courses section in the sidebar. This will remove it from the selected course sidebar and from the schedule itself. 
+	Once the user completes their schedule, they can save it to the database by clicking the save button. They can give it a name if they wish, but this is not required.
 	They may also load schedules from the database by pressing the load button and selecting the schedule they wish to load.  
 
 	Currently the user login system is not session based, so all schedules are accessible by all users of the system.
 
 	\item Login System
 
-	A user who wishes to login to the website navigates to the login page. Once there, if they already have an account, they can enter their username (email) and their password, then press to login button. This executes an SQL query to confirm that have an account and that they entered the correct password. If they do not have an account, they can enter their email and a password and press the create account button. This will create an entry in the database table for that user, and they will now be able to login to the system.
+	A user who wishes to login to the website navigates to the login page. Once there, if they already have an account, they can enter their email and password, and then press the login button. This executes an SQL query to confirm that the correct information has been entered. If they do not have an account, they can enter their desired email and password, and then press the create account button. This will create an entry in the database table for that user, enabling them to login to the system.
 
 	The website does not currently have sessions, so logging in does not carry over to the courses or schedule page. 
 
 \end{enumerate}
-
-\subsubsection*{Log In}
-\subsubsection*{Course Search}
-\subsubsection*{Schedule Creator}
 
 \subsection*{Entity Relationship Diagram}
 
@@ -172,21 +170,21 @@ A login system was started, from which users can be added to the database using 
 The red numbers on the diagram mark the changes from the initially presented diagram, and correspond to the list below.
 
 \begin{enumerate}
-	\item A prerequisite relation from Course to Course was added.
+	\item A prerequisite relation from Course to Course was added, as certain courses are needed before enrollment in other courses is allowed.
 	\item Removed the ``Course Requirements'' attribute from Degree because it was redundant. It's function is handled by the Requires relation from Degree to Course.
 	\item Added the ``Full Name'' attribute to Department because departments have a short code-name as well as a full English name. For example, ``CPSC'' and ``Computer Science.''
-	\item A Semester entity type was added, and the Has relation from Semester to Section.
+	\item A Semester entity type was added, and the Has relation from Semester to Section.  This is needed to indicate when courses are offered.
 \end{enumerate}
 
 \section*{Implementation}
 
 \subsection*{Relational Schema Diagram}
 
-Below you will find the relational schema diagram, which was created using the algorithm described in class that converts ERDs to RSDs. As you can see, there is a tuple for each entity type and relationship from the ER diagram, with arrows pointing from foreign keys to the primary keys they reference.
+Below you will find the relational schema diagram, which was created using the algorithm, described in class, that converts ERDs to RSDs. There is a tuple for each entity type and relationship from the ER diagram, with arrows pointing from foreign keys to the primary keys they reference.
 
 \includegraphics[width=\textwidth]{RelationalSchemaDiagram.png}
 
-During the conversion from the ERD to the RSD, redundancies were found and required information was missing. There were also some interesting constraints put on us by the DBMS that was used. For example, the ``User'' entity was renamed to ``user\_account'' because ``user'' was a reserved keyword.
+During the conversion from the ERD to the RSD, redundancies were found and required information was missing, leading to the changes that are described above the diagrams. There were also some constraints put on us by the DBMS that was used. For example, the ``User'' entity was renamed to ``user\_account'' because ``user'' was a reserved keyword.
 
 \subsection*{Database Management System}
 
@@ -268,5 +266,7 @@ There are many more INSERT queries in the various scrapers and test-data scripts
 \subsection*{User Interface}
 
 ``Present a brief description of your interface design, including several screenshots.''
+
+Every page is easy to navigate to, with there being only a small amount of pages to go to for users to create a schedule, gather information or login/create an account.  The information for every course is initally displayed when a user tries to search for a course, which are sorted alphabetically by department and then are stored in their department titles as a node. This enables users to quickly find course names, with descriptions, in a short amount of time.
 
 \end{document}
