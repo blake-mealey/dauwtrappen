@@ -177,7 +177,7 @@ function setupSearch() {
 		var filter = $(this).val().toLowerCase();
 		// Puts a space between a letter followed by a number so 'cpsc101' goes to 'cpsc 101' which is
 		// correctly matched by our search
-		filter = filter.replace(/([^0-9])([0-9])/g, '$1 $2');
+		//filter = filter.replace(/([^0-9])([0-9])/g, '$1 $2');
 		var parts = filter.split(" ");
 		console.log(filter);
 
@@ -187,10 +187,19 @@ function setupSearch() {
 		} else {
 			tree.search(function(node) {
 				var text = node.text.toLowerCase();
+				if (node.itree.parent != null) {
+					text = node.itree.parent.text.toLowerCase() + " " + text;
+
+					if (node.itree.parent.itree.parent != null) {
+						text = node.itree.parent.itree.parent.text.toLowerCase() + " " + text;
+					}
+				}
+
 				if(text.includes(filter)) return true;
 				for (var i = parts.length - 1; i >= 0; i--) {
-					if(text.includes(parts[i])) return true;
+					if(!text.includes(parts[i])) return false;
 				}
+				return true;
 			});
 		}
 	});
