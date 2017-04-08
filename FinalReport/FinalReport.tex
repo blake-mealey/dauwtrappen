@@ -13,7 +13,26 @@
 
 \usepackage{tgtermes}
 
+\usepackage{color}
 \usepackage{listings}
+\lstset{ %
+language=SQL,                % choose the language of the code
+basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+numbers=left,                   % where to put the line-numbers
+numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,           % adds a frame around the code
+tabsize=2,          % sets default tabsize to 2 spaces
+captionpos=b,           % sets the caption-position to bottom
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
 
 \usepackage[
 pdftitle={CPSC 471 Final Report},
@@ -40,8 +59,8 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 
 % custom theorems if needed
 \newtheoremstyle{mytheor}
-    {1ex}{1ex}{\normalfont}{0pt}{\scshape}{.}{1ex}
-    {{\thmname{#1 }}{\thmnumber{#2}}{\thmnote{ (#3)}}}
+	{1ex}{1ex}{\normalfont}{0pt}{\scshape}{.}{1ex}
+	{{\thmname{#1 }}{\thmnumber{#2}}{\thmnote{ (#3)}}}
 
 \theoremstyle{mytheor}
 \newtheorem{defi}{Definition}
@@ -144,87 +163,77 @@ During the conversion from the ERD to the RSD, redundancies were found and requi
 
 \subsection*{Database Management System}
 
-``Describe the DBMS you selected for the implementation	of the project, and include the SQL statements for each of the transactions implemented. It is not necessary to discuss these transactions in relational algebra or calculus.''
-
 PostgreSQL is the DBMS used because it is a full-featured SQL implementation with good support and documentation. Here are the SQL queries that were written:
 
 Get a list of all the semesters and the faculties they contain:
 \begin{lstlisting}
-    SELECT s.*, f.name as fac_name
-    FROM
-        faculty as f,
-        faculty_contains as fc,
-        course_section as c,
-        semester as s
-    WHERE
-        c.semester_id=s.id AND
-        c.dept_name=fc.dept_name AND
-        f.name=fc.faculty_name
-    GROUP BY s.id, f.name
+SELECT s.*, f.name AS fac_name
+FROM faculty AS f,
+	faculty_contains AS fc,
+	course_section AS c,
+	semester AS s
+WHERE c.semester_id=s.id AND
+	c.dept_name=fc.dept_name AND
+	f.name=fc.faculty_name
+GROUP BY s.id, f.name
 \end{lstlisting}
 
 Gets a list of all the semesters:
 \begin{lstlisting}
-    SELECT s.* FROM semester as s
+SELECT s.* FROM semester AS s
 \end{lstlisting}
 
 Gets a list of all the course sections from a faculty in a semester:
 \begin{lstlisting}
-    SELECT DISTINCT
-        s.*, c.*,
-        fc.faculty_name AS fac_name,
-        d.full_name AS dept_full_name
-    FROM
-        course as c,
-        faculty_contains as fc,
-        course_section as s,
-        department as d
-    WHERE
-        s.semester_id=<SEMESTER_ID> AND
-        s.dept_name=fc.dept_name AND
-        c.number=s.course_num AND
-        c.dept_name=s.dept_name AND
-        fc.faculty_name=<FACULTY_NAME> AND
-        d.name=s.dept_name
+SELECT DISTINCT s.*, c.*,
+	fc.faculty_name AS fac_name,
+	d.full_name AS dept_full_name
+FROM course AS c,
+	faculty_contains AS fc,
+	course_section AS s,
+	department AS d
+WHERE s.semester_id=<SEMESTER_ID> AND
+	s.dept_name=fc.dept_name AND
+	c.number=s.course_num AND
+	c.dept_name=s.dept_name AND
+	fc.faculty_name=<FACULTY_NAME> AND
+	d.name=s.dept_name
 \end{lstlisting}
 
 Gets a list of all the course sections from a faculty:
 \begin{lstlisting}
-    SELECT DISTINCT
-        s.*, c.*,
-        fc.faculty_name AS fac_name,
-        d.full_name AS dept_full_name
-    FROM
-        course as c,
-        faculty_contains as fc,
-        course_section as s,
-        department as d
-    WHERE
-        s.dept_name=fc.dept_name AND
-        c.number=s.course_num AND
-        c.dept_name=s.dept_name AND
-        fc.faculty_name=<FACULTY_NAME> AND
-        d.name=s.dept_name
+SELECT DISTINCT s.*, c.*,
+	fc.faculty_name AS fac_name,
+	d.full_name AS dept_full_name
+FROM course AS c,
+	faculty_contains AS fc,
+	course_section AS s,
+	department AS d
+WHERE s.dept_name=fc.dept_name AND
+	c.number=s.course_num AND
+	c.dept_name=s.dept_name AND
+	fc.faculty_name=<FACULTY_NAME> AND
+	d.name=s.dept_name
 \end{lstlisting}
 
 Checks if a user exists in the database with a given email and password:
 \begin{lstlisting}
-    SELECT email, password
-    FROM user_account
-    WHERE email=<EMAIL> AND password=<PASSWORD>
+SELECT email, password
+FROM user_account
+WHERE email=<EMAIL> AND password=<PASSWORD>
 \end{lstlisting}
 
 Checks if a user exists in the database with a given email:
 \begin{lstlisting}
-    SELECT email
-    FROM user_account
-    WHERE email=<EMAIL>
+SELECT email
+FROM user_account
+WHERE email=<EMAIL>
 \end{lstlisting}
 
 Adds a user account to the database with an email and password:
 \begin{lstlisting}
-    INSERT INTO user_account
-    VALUES (<EMAIL>, <PASSWORD>)
+INSERT INTO user_account
+VALUES (<EMAIL>, <PASSWORD>)
 \end{lstlisting}
 
 There are many more INSERT queries in the various scrapers and test-data scripts that populate the database with course information. These have been left out to shorten this document.
