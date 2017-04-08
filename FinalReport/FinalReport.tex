@@ -16,8 +16,8 @@
 
 
 \usepackage[
-pdftitle={CPSC 471 Final Report},
-pdfauthor={Timothy Mealey, University of Calgary},
+pdftitle={CPSC 471 Final Report}, 
+pdfauthor={Timothy Mealey, Ben Roberts, Cory Jensen, Scott Saunders, University of Calgary},
 colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,bookmarks=true,
 bookmarksopenlevel=2]{hyperref}
 \usepackage{amsmath,amssymb,amsthm,textcomp}
@@ -108,7 +108,36 @@ Describe (briefly) the system you have created to address the problem or task.''
 \subsection*{Users}
 
 ``Discuss the different users of your system. Your discussion in this section should be considerably more detailed than what you described for the presentation - this section should describe a complete transaction collection and, consequently, provide a complete picture of the functionality offered by your system.''
-\input{users}
+
+\begin{enumerate}
+	\item Course Browsing
+	A user interested in courses offered by the University of Calgary can navigate to the Dauwtrappen website. Once on the website, a series of SQL queries are executed which load the entire course list. These queries are executed in alphabetical order by department so that the user can begin interacting with the system before all of the data is loaded.
+	Once some or all of the course data is loaded, the user can either browse through the courses using the course tree or perform a search for preferred courses by department, course numbers, and course names. Courses that fulfill their selection/search criteria display the corresponding course information such as their name and number, description, prerequisites, and when/whether they are offered.
+
+	A user would use the Dauwtrappen website as opposed to the UofC Calender website for 3 reasons, some of which have already been mentioned:
+	Firstly, the intuitive search tool.
+	Secondly, the UofC Calender only mentions if courses are offered in even/odd years, but does not state which semester the courses will actually be offered in, whereas the Dauwtrappen course list does just that.
+	Thirdly, the overall integration of all aspects of the Dauwtrappen website.
+
+	\item Schedule Building
+	A student or perspective student can navigate to the schedule building page of the website in order to get organized for the upcoming semester. Again, a series of SQL queries are executing which loads the course data in a cascading fashion. The user can browse through the list or use the same search tool that is present in the course selection. 
+	The user can then click on a course to add it to the selected courses panel on the right side of the screen. This panel will then display the various lectures, tutorials, and labs available for that course, as well as their corresponding times. The user can individually click on these sections to add them to their schedule. To remove a selected course, the user can click the little X button on the course. This will remove it from the selected course panel and any selected sections will be removed from the schedule itself. 
+	Once the user completes their schedule, they can click the save button to save their schedule to the database. They can give it a name if they wish, but this is not required.
+	They may also load schedules from the database by pressing the load button and selecting the schedule they wish to load.  
+
+	Currently the user login system is not session based, so all schedules are accessible by all users of the system.
+
+	\item Login System
+
+	A user who wishes to login to the website navigates to the login page. Once there, if they already have an account, they can enter their username (email) and their password, then press to login button. This executes an SQL query to confirm that have an account and that they entered the correct password. If they do not have an account, they can enter their email and a password and press the create account button. This will create an entry in the database table for that user, and they will now be able to login to the system.
+
+	The website does not currently have sessions, so logging in does not carry over to the courses or schedule page. 
+
+\end{enumerate}
+
+\subsubsection*{Log In}
+\subsubsection*{Course Search}
+\subsubsection*{Schedule Creator}
 
 \subsection*{Entity Relationship Diagram}
 
