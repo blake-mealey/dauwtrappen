@@ -34,23 +34,40 @@ block center
 
 
 
+	#login-box.card
+		p(id="emailTF")
+		//This is the text box on screen
+
+		.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+			input.mdl-textfield__input(type="text" id="email")
+			label.mdl-textfield__label(for="email") Email
+		//input(type="text" name="email" id="email" value="")
 
 
-	p(id="emailTF") Email:
-	//This is the text box on screen
-	input(type="text" name="email" id="email" value="")
-	
-	p(id="passwordTF") Password:
-	
-	//^
-	input(type="password" name="password" id="password" value="")
-	
-	//Login button.
-	input(type="submit" value="Login" id="login" onclick="loggingIn()")
+		<!-- Simple Textfield -->
+		.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+			input.mdl-textfield__input(type="password" id="password")
+			label.mdl-textfield__label(for="password") Password
 
 
-	//Create Account button.
-	input(type="submit" value="Create" id="create" onclick="createAccount()")
+
+
+
+		//^
+		//input(type="password" name="password" id="password" value="")
+
+		p
+
+		button#login.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(onclick="loggingIn()") Login
+		button#create.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(onclick="createAccount()") Create
+
+
+		//Login button.
+		//input(type="submit" value="Login" id="login" onclick="loggingIn()")
+
+
+		//Create Account button.
+		//input(type="submit" value="Create" id="create" onclick="createAccount()")
 
 
 

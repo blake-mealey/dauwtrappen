@@ -11,23 +11,24 @@ function loggingIn()
 	
 	$.get("/data/login", {email: $("#email").val(), password: $("#password").val()},function (data)
 	{
-		$("#emailTF").text("Email: ");
-		$("#passwordTF").text("Password: ");
+		$("#emailTF").text("");
+		$("#emailTF").css("color","#ff0000");
 		if(data == "NE")
 		{
-			$("#emailTF").text("Email: No email entered");
+			$("#emailTF").text("No email entered");
 		}
 		else if(data == "NP")
 		{
-			$("#passwordTF").text("Password: No password entered");
+			$("#emailTF").text("No password entered");
 		}
 		else if(data == "ILI")
 		{
-			$("#emailTF").text("Email: Wrong Email or Password");
+			$("#emailTF").text("Wrong Email or Password");
 		}
 		else if(data == "LI")
 		{
-			$("#emailTF").text("Email: Logging In");
+			$("#emailTF").css("color","#29ae00");
+			$("#emailTF").text("Logging In");
 		}
 	});
 	
@@ -40,24 +41,25 @@ function createAccount()
 {
 	$.get("/data/createAccount", {email: $("#email").val(), password: $("#password").val()},function (data)
 	{
-		$("#emailTF").text("Email: ");
-		$("#passwordTF").text("Password: ");
-		
+		$("#emailTF").text("");
+
+		$("#emailTF").css("color","#ff0000");
 		if(data == "IEE")
 		{
-			$("#emailTF").text("Email: Invalid Email Entered");
+			$("#emailTF").text("Invalid Email Entered");
 		}
 		else if(data == "IPE")
 		{
-			$("#passwordTF").text("Password: Invalid Password Entered");
+			$("#emailTF").text("Invalid Password Entered");
 		}
 		else if(data == "EIU")
 		{
-			$("#emailTF").text("Email: Email In Use");
+			$("#emailTF").text("Email In Use");
 		}
 		else if(data == "AC")
 		{
-			$("#emailTF").text("Email: Account Created");
+			$("#emailTF").css("color","#29ae00");
+			$("#emailTF").text("Account Created");
 		}
 	});
 	
