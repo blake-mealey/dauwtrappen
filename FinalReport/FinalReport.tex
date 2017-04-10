@@ -201,6 +201,26 @@ During the conversion from the ERD to the RSD, redundancies were found and requi
 
 PostgreSQL is the DBMS used because it is a full-featured SQL implementation with good support and documentation. Here are the SQL queries that were written:
 
+Checks if a user exists in the database with a given email and password:
+\begin{lstlisting}
+SELECT email, password
+FROM user_account
+WHERE email=<EMAIL> AND password=<PASSWORD>
+\end{lstlisting}
+
+Checks if a user exists in the database with a given email:
+\begin{lstlisting}
+SELECT email
+FROM user_account
+WHERE email=<EMAIL>
+\end{lstlisting}
+
+Adds a user account to the database with an email and password:
+\begin{lstlisting}
+INSERT INTO user_account
+VALUES (<EMAIL>, <PASSWORD>)
+\end{lstlisting}
+
 Get a list of all the semesters and the faculties they contain:
 \begin{lstlisting}
 SELECT s.*, f.name AS fac_name
@@ -267,29 +287,34 @@ LEFT JOIN course_section AS s
 	AND c.dept_name=s.dept_name
 \end{lstlisting}
 
-Checks if a user exists in the database with a given email and password:
+Gets the list of sections contained in a schedule:
 \begin{lstlisting}
-SELECT email, password
-FROM user_account
-WHERE email=<EMAIL> AND password=<PASSWORD>
+SELECT s.*, c.*, cs.*
+FROM schedule AS s,
+	course AS c,
+	course_section AS cs,
+	schedule_section AS ss 
+WHERE s.id=<SCHEDULE_ID>
+	AND ss.sched_id=s.id
+	AND cs.id=ss.section_id
+	AND c.number=cs.course_num
+	AND c.dept_name=cs.dept_name
 \end{lstlisting}
 
-Checks if a user exists in the database with a given email:
+Saves a schedule with an ID, name, description, and user email:
 \begin{lstlisting}
-SELECT email
-FROM user_account
-WHERE email=<EMAIL>
+INSERT INTO schedule
+	VALUES (<SCHEDULE_ID>,<NAME>,<DESCRIPTION>,<USER_EMAIL>)
 \end{lstlisting}
 
-Adds a user account to the database with an email and password:
+Adds a section to a schedule:
 \begin{lstlisting}
-INSERT INTO user_account
-VALUES (<EMAIL>, <PASSWORD>)
+INSERT INTO schedule_section
+	VALUES (<SCHEDULE_ID>,<SECTION_ID>)
 \end{lstlisting}
 
-There are many more INSERT queries in the various scrapers and test-data scripts that populate the database with course information. These have been left out to shorten this document.
+There are many more INSERT queries in the various scrapers and test-data scripts that populate the database with course information. These have been left out as they do not pertain to transactions within the site.
 
-\pagebreak
 \subsection*{User Interface}
 
 Every page is easy to navigate to, with there being only a small amount of pages to go to for users to create a schedule, gather information or login/create an account. The buttons at the top right of the screen are used to access each of these pages.
