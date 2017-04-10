@@ -208,9 +208,9 @@ FROM faculty AS f,
 	faculty_contains AS fc,
 	course_section AS c,
 	semester AS s
-WHERE c.semester_id=s.id AND
-	c.dept_name=fc.dept_name AND
-	f.name=fc.faculty_name
+WHERE c.semester_id=s.id
+	AND c.dept_name=fc.dept_name
+	AND f.name=fc.faculty_name
 GROUP BY s.id, f.name
 \end{lstlisting}
 
@@ -228,31 +228,45 @@ FROM course AS c,
 	faculty_contains AS fc,
 	course_section AS s,
 	department AS d
-WHERE s.semester_id=<SEMESTER_ID> AND
-	s.dept_name=fc.dept_name AND
-	c.number=s.course_num AND
-	c.dept_name=s.dept_name AND
-	fc.faculty_name=<FACULTY_NAME> AND
-	d.name=s.dept_name
-\end{lstlisting}
-
-Gets a list of all the course sections from a faculty:
-\begin{lstlisting}
-SELECT DISTINCT s.*, c.*,
-	fc.faculty_name AS fac_name,
-	d.full_name AS dept_full_name
-FROM course AS c,
-	faculty_contains AS fc,
-	course_section AS s,
-	department AS d
-WHERE s.dept_name=fc.dept_name AND
-	c.number=s.course_num AND
-	c.dept_name=s.dept_name AND
-	fc.faculty_name=<FACULTY_NAME> AND
-	d.name=s.dept_name
+WHERE s.semester_id=<SEMESTER_ID>
+	AND s.dept_name=fc.dept_name
+	AND c.number=s.course_num
+	AND c.dept_name=s.dept_name
+	AND fc.faculty_name=<FACULTY_NAME>
+	AND d.name=s.dept_name
 \end{lstlisting}
 
 \pagebreak
+
+Gets a list of all the courses and course sections from a faculty with their prerequisites:
+\begin{lstlisting}
+SELECT DISTINCT c.*, s.*,
+	c.number AS course_num,
+	c.dept_name AS dept_name
+FROM (SELECT DISTINCT c.*,
+		fc.faculty_name AS fac_name,
+		d.full_name AS dept_full_name
+	FROM faculty_contains AS fc,
+		department AS d,
+		(SELECT DISTINCT c.*,
+			p.prereq_num,
+			p.prereq_dept
+			FROM course AS c
+			LEFT JOIN prerequisite AS p
+				ON p.course_num=c.number
+				AND p.course_dept=c.dept_name
+		) AS c
+	CROSS JOIN course_section AS s
+	WHERE d.name=c.dept_name
+		AND d.name=fc.dept_name
+		AND fc.faculty_name=<FACULTY_NAME>
+		AND c.dept_name=s.dept_name
+) AS c
+LEFT JOIN course_section AS s
+	ON c.number=s.course_num
+	AND c.dept_name=s.dept_name
+\end{lstlisting}
+
 Checks if a user exists in the database with a given email and password:
 \begin{lstlisting}
 SELECT email, password
@@ -275,6 +289,7 @@ VALUES (<EMAIL>, <PASSWORD>)
 
 There are many more INSERT queries in the various scrapers and test-data scripts that populate the database with course information. These have been left out to shorten this document.
 
+\pagebreak
 \subsection*{User Interface}
 
 Every page is easy to navigate to, with there being only a small amount of pages to go to for users to create a schedule, gather information or login/create an account. The buttons at the top right of the screen are used to access each of these pages.
