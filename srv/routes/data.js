@@ -317,6 +317,31 @@ router.get('/createAccount', function(req, res) {
 });
 //END:  Function for assisting in account creation
 
+router.get('/loadSchedule', function(req, res) {
+	console.log("Schedule load called");
+
+	//Load the schedule with id 1
+	var client = new Client(config);
+	client.connect();
+
+	var q = escape("SELECT s.*, c.*, cs.* " +
+		"FROM schedule AS s, course AS c, course_section AS cs, schedule_section AS ss " + 
+		"WHERE s.id=%L AND ss.sched_id=s.id AND cs.id = ss.section_id AND c.number = cs.course_num AND c.dept_name = cs.dept_name",
+		"1");
+
+	client.query(q, function (err, result) {
+		client.end();
+		if(err) {
+			console.log(err);
+			res.send(error(DB_ERROR));
+			return;
+		}
+
+		res.send(success({schedule: result.rows}));
+	});
+});
+
+
 router.post('/saveSchedule', function (req, res) {
 	console.log(req.body);
 

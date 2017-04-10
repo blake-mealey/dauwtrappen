@@ -56,6 +56,10 @@ $(document).ready(function () {
 
 	$("#load-btn").click(function() {
 		console.log("Clicked load");
+		$.get("/data/loadSchedule", {}, function(res) {
+			console.log(res);
+		});
+
 		//Implement some sort of load feature
 		//Should popup a windows with a list of schedules that the user can select from
 	});
@@ -167,7 +171,7 @@ function SelectCourse(node) {
 
 			//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
 			var scale = (timeR - timeL) / 60;
-			var top = ((startHour - 6) * 6.666) + (6.666 * startMinute/60) * 100;
+			var top = ((startHour - 6) * 6.666) + (6.666 * startMinute/60);
 
 			$classOverlay.css({
 				top: top + "%", 
