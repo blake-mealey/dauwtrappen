@@ -8,7 +8,12 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+
 \usepackage{graphicx}
+\makeatletter
+\g@addto@macro\@floatboxreset\centering
+\makeatother
+
 \usepackage{xcolor}
 
 \usepackage{tgtermes}
@@ -165,7 +170,10 @@ A login system was started, from which users can be added to the database using 
 
 \subsection*{Entity Relationship Diagram}
 
-\includegraphics[width=\textwidth]{ERDiagram.png}
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{ERDiagram.png} 
+	\caption{Entity relationship diagram.}
+\end{figure}
 
 The red numbers on the diagram mark the changes from the initially presented diagram, and correspond to the list below.
 
@@ -182,7 +190,10 @@ The red numbers on the diagram mark the changes from the initially presented dia
 
 Below you will find the relational schema diagram, which was created using the algorithm, described in class, that converts ERDs to RSDs. There is a tuple for each entity type and relationship from the ER diagram, with arrows pointing from foreign keys to the primary keys they reference.
 
-\includegraphics[width=\textwidth]{RelationalSchemaDiagram.png}
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{RelationalSchemaDiagram.png} 
+	\caption{Relational schema diagram.}
+\end{figure}
 
 During the conversion from the ERD to the RSD, redundancies were found and required information was missing, leading to the changes that are described above the diagrams. There were also some constraints put on us by the DBMS that was used. For example, the ``User'' entity was renamed to ``user\_account'' because ``user'' was a reserved keyword.
 
@@ -265,26 +276,45 @@ There are many more INSERT queries in the various scrapers and test-data scripts
 
 \subsection*{User Interface}
 
-``Present a brief description of your interface design, including several screenshots.''
+Every page is easy to navigate to, with there being only a small amount of pages to go to for users to create a schedule, gather information or login/create an account. The buttons at the top right of the screen are used to access each of these pages.
 
-Every page is easy to navigate to, with there being only a small amount of pages to go to for users to create a schedule, gather information or login/create an account.  The information for every course is initally displayed when a user tries to search for a course, which are sorted alphabetically by department and then are stored in their department titles as a node. This enables users to quickly find course names, with descriptions, in a short amount of time.
-
-\begin{center}
 \begin{figure}[h!]
-	\caption{A picture of the universe!}
 	\includegraphics[width=\textwidth]{loginBlank.png} 
+	\caption{Login page.}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics{loginNewAccount.png}
+	\caption{Clicked create with email not in the database.}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics{loginExistingAccount.png}
+	\caption{Clicked create with email in the database.}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics{loginBadAccount.png}
+	\caption{Clicked login with email/password pair not in the database.}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics{login.png}
+	\caption{Clicked login with email/password pair in the database.}
 \end{figure}
 
-\includegraphics{loginBadAccount.png} \\
-\includegraphics{loginNewAccount.png} \\
-\includegraphics{loginExistingAccount.png} \\
-\includegraphics{login.png} \\
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{courses.png}
+	\caption{Course search page. Displays course names, descriptions, prerequisites, and semesters offered.}
+\end{figure}
 
-\includegraphics[width=\textwidth]{courses.png} \\
-
-\includegraphics[width=\textwidth]{scheduleSearch.png} \\
-\includegraphics[width=\textwidth]{scheduleCourses.png} \\
-\includegraphics[width=\textwidth]{scheduleSave.png}
-\end{center}
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{scheduleSearch.png}
+	\caption{Schedule builder page. Demonstrating sidebar search feature.}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{scheduleCourses.png}
+	\caption{Building a schedule. Click courses in the left sidebar to display their sections in the right sidebar. Click the sections links to add them to the calendar view.}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{scheduleSave.png}
+	\caption{Clicked the save button. Enter a name then click save again to save the schedule to the database.}
+\end{figure}
 
 \end{document}
