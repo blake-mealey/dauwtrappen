@@ -43,6 +43,7 @@ $(document).ready(function () {
 		console.log(req);
 		$.post("/data/saveSchedule", req, function(res) {
 			console.log(res);
+
 			//Then we need to reset everything
 			$("#name-input").val("");
 			$("#name-input-cont").removeClass("is-dirty");
@@ -57,13 +58,17 @@ $(document).ready(function () {
 	$("#load-btn").click(function() {
 		console.log("Clicked load");
 		$.get("/data/loadSchedule", {}, function(res) {
-			console.log(res);
+			loadSchedule(res);
 		});
 
 		//Implement some sort of load feature
 		//Should popup a windows with a list of schedules that the user can select from
 	});
 });
+
+function loadSchedule(scheduleInfo) {
+	console.log(scheduleInfo);
+}
 
 var selected = {};
 var selectedSections = [];
