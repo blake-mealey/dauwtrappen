@@ -29,8 +29,8 @@ function scrapeSemesters() {
 			function each() {
 				if(data[index]) {
 					var term = data[index++].$;
-					console.log(term);
-					if(term.desc == "Fall 2017" || term.desc == "Fall 2016") {
+					if(term.desc == "Spring 2017") {
+						console.log(term.desc);
 						semesterId = term.name;
 						saveSemester(term, function () {
 							scrapeSemester(term.name, each);
@@ -134,9 +134,17 @@ var semesterId;
 var sectionId = 0;
 function saveSection(client, dept, courseNum, section, cb) {
 	var type = ((section.$.type == "Lecture") ? "LEC" : (section.$.type == "Lab") ? "LAB" : "TUT");
-	var time = (section.time ? ("'" + section.time[0].$.day + section.time[0].$.time + "'") : "NULL");
-	var q = escape("INSERT INTO course_section VALUES(%L,%s,%s,%s,%L,%s,NULL,%L,%L,%L) ON CONFLICT DO NOTHING",
-		type, semesterId, section.$.name, time, section.room[0], sectionId++, section.instructor, courseNum, dept);
+	var timeString = "";
+	if(section.time) {
+		for (var i = 0; i < section.time.length; i++) {
+			var time = section.time[i];
+			var times = time.$.time.split(" - ");
+			timeString += (time.$.day + "," + times[0] + "," + times[1] + ".");
+		}
+	}
+	// var time = (section.time ? ("'" + section.time[0].$.day + section.time[0].$.time + "'") : "NULL");
+	var q = escape("INSERT INTO course_section VALUES(%L,%s,%s,%L,%L,%s,NULL,%L,%L,%L) ON CONFLICT DO NOTHING",
+		type, semesterId, section.$.name, timeString, section.room[0], sectionId++, section.instructor, courseNum, dept);
 	// console.log(q);
 	client.query(q, function (err) {
 		if(err) return console.log(err);
