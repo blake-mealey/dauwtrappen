@@ -116,3 +116,5 @@ srv/public/stylesheets/courses-style.css.map
 srv/public/stylesheets/schedule.css.map
 srv/public/stylesheets/style.css.map
 
+#Ignore all maps?
+*.map
