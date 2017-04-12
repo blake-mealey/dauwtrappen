@@ -69,16 +69,9 @@ CREATE TABLE prerequisite(
  	FOREIGN KEY (prereq_dept, prereq_num) REFERENCES course(dept_name, number) ON DELETE CASCADE ON UPDATE CASCADE
  );
 
-DROP TYPE IF EXISTS section_type CASCADE;
-CREATE TYPE section_type AS ENUM (
-	'LEC',
-	'TUT',
-	'LAB'
-);
-
 DROP TABLE IF EXISTS course_section CASCADE;
 CREATE TABLE course_section(
-	type section_type,
+	type text,
 	semester_id int,
 	number smallint,
 	time text,

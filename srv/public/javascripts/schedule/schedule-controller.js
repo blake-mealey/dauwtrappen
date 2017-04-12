@@ -38,11 +38,12 @@ $(document).ready(function () {
 		//Firstly we need to save everything
 		var req = {
 			scheduleName: $("#name-input").val(),
-			sections: selectedSections
+			"sections[]": selectedSections
 		}
 		console.log(req);
 		$.post("/data/saveSchedule", req, function(res) {
 			console.log(res);
+
 			//Then we need to reset everything
 			$("#name-input").val("");
 			$("#name-input-cont").removeClass("is-dirty");
@@ -57,7 +58,7 @@ $(document).ready(function () {
 	$("#load-btn").click(function() {
 		console.log("Clicked load");
 		$.get("/data/loadSchedule", {}, function(res) {
-			console.log(res);
+			loadSchedule(res);
 		});
 
 		//Implement some sort of load feature
@@ -65,11 +66,15 @@ $(document).ready(function () {
 	});
 });
 
+function loadSchedule(scheduleInfo) {
+	console.log(scheduleInfo);
+}
+
 var selected = {};
 var selectedSections = [];
 var selectedCount = 0;
 
-var daysToNum = {"Mon": 1, "Tue": 2, "Wed": 3,"Thu": 4,"Fri": 5,"Sat": 6,"Sun": 7};
+var daysToNum = {"mon": 1, "tue": 2, "wen": 3,"thur": 4,"fri": 5,"sat": 6,"sun": 7};
 
 function SelectCourse(node) {
 
@@ -101,9 +106,16 @@ function SelectCourse(node) {
 	$close.click(function() {
 		$card.remove();
 
-		for (var overlay in selected[id].overlays) {
-			if (!selected[id].overlays.hasOwnProperty(overlay)) continue;
-			selected[id].overlays[overlay].remove();
+		for (var overlayArray in selected[id].overlays) {
+			if (!selected[id].overlays.hasOwnProperty(overlayArray)) continue;
+			for (var overlay in selected[id].overlays[overlayArray]) {
+				if (!selected[id].overlays[overlayArray].hasOwnProperty(overlay)) continue;
+				var section_id = selected[id].overlays[overlayArray][overlay]("data-index");
+				var index = selectedSections.indexOf(section_id);
+				if (index > -1) selectedSections.splice(index, 1);
+				
+				selected[id].overlays[overlayArray][overlay].remove();
+			}
 		}
 
 		selected[id] = undefined;
@@ -136,8 +148,9 @@ function SelectCourse(node) {
 		console.log(data.sections[i]);
 		var section = data.sections[i];
 		var $p = $("<p>");
+		var formattedTime = formatTime(section.time);
 		var $a = $("<a>", {
-			text: section.type + ": " + section.time,
+			text: section.type + " " + section.section_number + ": " + formattedTime,
 			href: "",
 			"data-index": i
 		});
@@ -149,40 +162,48 @@ function SelectCourse(node) {
 
 			if (selected[id].overlays[index]) return;
 
-			var $classOverlay = $("<div>", {
-				class: "class-overlay",
-				text: data.sections[index].time,
-			});
+			var totalTime = data.sections[index].time.split(".");
+			//Push the section id
 			selectedSections.push(data.sections[index].section_id);
 
-			var time = data.sections[index].time;
-			var day = time.substring(0, 3);
+			// for each class time t in time
+			for (var t in totalTime) {
 
-			//Remove the day from the time
-			time = time.substring(3);
-			var timeArr = time.split("-");
-			var timeL = timeArr[0];
-			var timeR = timeArr[1];
+				var split = totalTime[t].split(",");
+				var day = split[0];
+				var t1 = split[1];
+				var t2 = split[2];
+				console.log(totalTime[t]);
 
-			var startHour = Number(timeL.split(":")[0].trim());
-			var startMinute = Number(timeL.split(":")[1].trim());
-			timeL = startHour*60 + startMinute;
-			timeR = Number(timeR.split(":")[0].trim())*60 + Number(timeR.split(":")[1].trim());
+				var $classOverlay = $("<div>", {
+					class: "class-overlay",
+					text: split[1]+"-"+split[2],
+					"data-index": data.sections[index].section_id
+				});
 
-			//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
-			var scale = (timeR - timeL) / 60;
-			var top = ((startHour - 6) * 6.666) + (6.666 * startMinute/60);
+				//Find the time difference in minutes
+				var diff = getTimeDifference(t1, t2);
+				var start = parseTime(t1);
 
-			$classOverlay.css({
-				top: top + "%", 
-				left: (daysToNum[day])/8 * 100 + 0.25 + "%",
-				height: 6.66*scale + "%",
-				width: "12%"
-			});
+				//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
+				var scale = diff / 60;
+				var top = ((start.hour - 6) * 6.666) + (6.666 * start.minute/60);
 
-			$("table").append($classOverlay);
+				$classOverlay.css({
+					top: top + "%", 
+					left: (daysToNum[day])/8 * 100 + 0.25 + "%",
+					height: 6.66*scale + "%",
+					width: "12%"
+				});
 
-			selected[id].overlays[index] = $classOverlay; 
+				$("table").append($classOverlay);
+
+				if (selected[id].overlays[index]) selected[id].overlays[index].push($classOverlay);
+				else { 
+					selected[id].overlays[index] = [];
+					selected[id].overlays[index].push($classOverlay);
+				};	
+			} 
 		});
 
 		$p.append($a);
@@ -194,4 +215,46 @@ function SelectCourse(node) {
 		card: $card,
 		overlays: {}
 	};
+}
+
+//Assume time1 and time2 follow this format: 9:00AM
+function getTimeDifference(time1, time2) {
+
+	var time1Parsed = parseTime(time1);
+	var time2Parsed = parseTime(time2);
+
+	var time1Final = (time1Parsed.hour * 60) + time1Parsed.minute;
+	var time2Final = (time2Parsed.hour * 60) + time2Parsed.minute;
+
+	return time2Final - time1Final;
+}
+
+//Returns the hour of the given time
+function parseTime(time) {
+	var split = time.split(":");
+
+	var h = Number(split[0]);
+	var m = Number(split[1].substring(0,2));
+	var a = split[1].substring(2); 
+
+	if (a == "PM") h += 12;
+
+	return {hour: h, minute: m};
+}
+
+//formats the time string for displaying
+function formatTime(time) {
+
+	var formatted = "";
+
+	var split = time.split(".");
+
+	for (var i in split) {
+		formatted += split[i].split(",")[0] + ",";
+	}
+
+	var temp = split[split.length-1].split(",");
+	formatted += temp[1] + "-" + temp[2];
+
+	return formatted;
 }

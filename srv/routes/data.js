@@ -117,8 +117,8 @@ router.get('/courses', function(req, res) {
 
 	var q;
 	if(req.query.semesterId) {
-		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
-			"FROM course AS c, faculty_contains AS fc, course_section AS s, department AS d " +
+		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name, s.number AS c_number " +
+			"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
 			"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
 			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
 			req.query.semesterId, req.query.facultyName);
@@ -193,13 +193,13 @@ router.get('/courses', function(req, res) {
 
 			if (obj.id) {
 				parent.sections.push({
-					section_number: obj.course_num,
 					type: obj.type,
 					time: obj.time,
 					location: obj.location,
 					section_id: obj.id,
 					instr_name: obj.ta_name || obj.instr_name,
-					semester_id: obj.semester_id
+					semester_id: obj.semester_id,
+					section_number: obj.c_number
 				});
 
 				if (parent.semesters.indexOf(obj.semester_id) == -1) {
@@ -358,18 +358,36 @@ router.get('/loadSchedule', function(req, res) {
 		"WHERE s.id=%L AND ss.sched_id=s.id AND cs.id = ss.section_id AND c.number = cs.course_num AND c.dept_name = cs.dept_name",
 		"1");
 
-	client.query(q, function (err, result) {
-		client.end();
+	client.query(q, function (err, result1) {
 		if(err) {
 			console.log(err);
+			client.end();
 			res.send(error(DB_ERROR));
 			return;
 		}
 
-		res.send(success({schedule: result.rows}));
+		q = escape("SELECT DISTINCT cs2.* " +
+		"FROM schedule AS s, course AS c, course_section AS cs, course_section AS cs2, schedule_section AS ss " + 
+		"WHERE s.id=%L AND ss.sched_id=s.id AND cs.id = ss.section_id AND c.number = cs.course_num AND c.dept_name = cs.dept_name AND " +
+		"cs2.dept_name = c.dept_name AND cs2.course_num = c.number AND cs2.semester_id = cs.semester_id",
+		"1");
+		client.query(q, function (err, result2) {
+			client.end();
+			if(err) {
+				console.log(err);
+				res.send(error(DB_ERROR));
+				return;
+			}
+
+			res.send(success({schedule: result1.rows, sections: result2.rows}));
+		});
 	});
 });
 
+//Checks if the given value is an array or not
+function check_array (value) {
+    return value && typeof value === 'object' && value.constructor === Array;
+}
 
 router.post('/saveSchedule', function (req, res) {
 	console.log(req.body);
@@ -384,7 +402,12 @@ router.post('/saveSchedule', function (req, res) {
 		return;
 	}
 
-	req.body.sections = req.body["sections[]"];
+	//Solves the 1 element array issue where if only 1 section is selected, then this wont be an array, it will be a string
+	if (!check_array(req.body["sections[]"])) {
+		var temp = req.body["sections[]"];
+		req.body["sections[]"] = [];
+		req.body["sections[]"].push(temp);
+	}
 
 	var client = new Client(config);
 	client.connect();
@@ -392,7 +415,7 @@ router.post('/saveSchedule', function (req, res) {
 
 	//START: creates query and gets results
 	var q = escape("INSERT INTO schedule " +
-		"VALUES ('1',%L,'DESCRIPTION','blake@ben.com')",
+		"VALUES ('1',%L,'DESCRIPTION','blakemealey@gmail.com')",
 		req.body.scheduleName);
 	client.query(q, function (err, result) {
 		if(err) {
@@ -403,13 +426,14 @@ router.post('/saveSchedule', function (req, res) {
 
 		var index = 0;
 		function each() {
-			var element = req.body.sections[index++];
+			var element = req.body["sections[]"][index++];
 			if(!element) {
 				client.end();
 				res.send(success({}));
 				return;
 			}
 
+			console.log(element);
 			var q = escape("INSERT INTO schedule_section " +
 				"VALUES ('1',%s)",
 				element);

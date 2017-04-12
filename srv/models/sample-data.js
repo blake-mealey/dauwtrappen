@@ -111,10 +111,10 @@ new pg.Pool(config).connect(function (err, c) {
 		"'Syed Zain Raza Rizvi')");
 
 	query("INSERT INTO course_section VALUES(" +
-		"'LAB', 1234, 1, 'Fr 9:00AM-11:50AM,Fr 1:00PM-3:50PM', 'ST 135', 70349, 'Syed Zain Raza Rizvi', NULL, 101, 'CPSC')");
+		"'LAB', 1234, 1, 'mon,9:00AM,11:50AM.tue,9:00AM,11:50AM.wen,9:00AM,11:50AM.thur,9:00AM,11:50AM', 'ST 135', 70349, 'Syed Zain Raza Rizvi', NULL, 101, 'CPSC')");
 
 	query("INSERT INTO course_section VALUES(" +
-		"'LAB', 1234, 1, 'WeTh 9:00AM-11:50AM,WeTh 1:00PM-3:50PM', 'ST 139', 70350, 'Syed Zain Raza Rizvi', NULL, 102, 'CPSC')");
+		"'LAB', 1234, 1, 'tue,4:00PM,4:50PM.thur,4:00PM,4:50PM', 'ST 139', 70350, 'Syed Zain Raza Rizvi', NULL, 102, 'CPSC')");
 
 	query("INSERT INTO schedule VALUES(" +
 		"'109156be-c4fb-41ea-b1b4-efe1671c5836', 'My Schedule', 'testing 1, 2, 3...', 'blakemealey@gmail.com')");
