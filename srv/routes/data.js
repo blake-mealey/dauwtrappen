@@ -117,7 +117,7 @@ router.get('/courses', function(req, res) {
 
 	var q;
 	if(req.query.semesterId) {
-		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name, s.number AS c_number " +
 			"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
 			"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
 			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
@@ -165,13 +165,13 @@ router.get('/courses', function(req, res) {
 			parent = parent[obj.course_num];
 
 			parent.sections.push({
-				section_number: obj.number,
 				type: obj.type,
 				time: obj.time,
 				location: obj.location,
 				section_id: obj.id,
 				instr_name: obj.ta_name || obj.instr_name,
-				semester_id: obj.semester_id
+				semester_id: obj.semester_id,
+				section_number: obj.c_number
 			});
 
 			if(parent.semesters.indexOf(obj.semester_id) == -1) {

@@ -110,6 +110,10 @@ function SelectCourse(node) {
 			if (!selected[id].overlays.hasOwnProperty(overlayArray)) continue;
 			for (var overlay in selected[id].overlays[overlayArray]) {
 				if (!selected[id].overlays[overlayArray].hasOwnProperty(overlay)) continue;
+				var section_id = selected[id].overlays[overlayArray][overlay]("data-index");
+				var index = selectedSections.indexOf(section_id);
+				if (index > -1) selectedSections.splice(index, 1);
+				
 				selected[id].overlays[overlayArray][overlay].remove();
 			}
 		}
@@ -146,7 +150,7 @@ function SelectCourse(node) {
 		var $p = $("<p>");
 		var formattedTime = formatTime(section.time);
 		var $a = $("<a>", {
-			text: section.type + ": " + formattedTime,
+			text: section.type + " " + section.section_number + ": " + formattedTime,
 			href: "",
 			"data-index": i
 		});
@@ -174,6 +178,7 @@ function SelectCourse(node) {
 				var $classOverlay = $("<div>", {
 					class: "class-overlay",
 					text: split[1]+"-"+split[2],
+					"data-index": data.sections[index].section_id
 				});
 
 				//Find the time difference in minutes
