@@ -110,3 +110,9 @@ fabric.properties
 
 # Sass
 srv/public/stylesheets/style.css.map
+
+#Ohgod
+srv/public/stylesheets/courses-style.css.map
+srv/public/stylesheets/schedule.css.map
+srv/public/stylesheets/style.css.map
+
