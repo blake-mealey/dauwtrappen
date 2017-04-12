@@ -359,28 +359,14 @@ router.get('/loadSchedule', function(req, res) {
 		"1");
 
 	client.query(q, function (err, result1) {
+		client.end();
 		if(err) {
 			console.log(err);
 			client.end();
 			res.send(error(DB_ERROR));
 			return;
 		}
-
-		q = escape("SELECT DISTINCT cs2.* " +
-		"FROM schedule AS s, course AS c, course_section AS cs, course_section AS cs2, schedule_section AS ss " + 
-		"WHERE s.id=%L AND ss.sched_id=s.id AND cs.id = ss.section_id AND c.number = cs.course_num AND c.dept_name = cs.dept_name AND " +
-		"cs2.dept_name = c.dept_name AND cs2.course_num = c.number AND cs2.semester_id = cs.semester_id",
-		"1");
-		client.query(q, function (err, result2) {
-			client.end();
-			if(err) {
-				console.log(err);
-				res.send(error(DB_ERROR));
-				return;
-			}
-
-			res.send(success({schedule: result1.rows, sections: result2.rows}));
-		});
+		res.send(success({schedule: result1.rows}));
 	});
 });
 
