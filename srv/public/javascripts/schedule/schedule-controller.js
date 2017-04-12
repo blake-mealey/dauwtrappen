@@ -162,9 +162,13 @@ function SelectCourse(node) {
 
 			var index = $(this).attr("data-index");
 
-			if (selected[id].overlays[index]) return;
+			if (selected[id].overlays[index] || data.sections[index].time == "") return;
 
 			var totalTime = data.sections[index].time.split(".");
+			if (totalTime.length > 0) totalTime.splice(totalTime.length-1, 1);
+
+			console.log(totalTime);
+
 			//Push the section id
 			selectedSections.push(data.sections[index].section_id);
 			console.log(selectedSections);
@@ -274,9 +278,12 @@ function parseTime(time) {
 //formats the time string for displaying
 function formatTime(time) {
 
+	if (time == "") return "No Times";
+
 	var formatted = "";
 
 	var split = time.split(".");
+	split.splice(split.length-1, 1);
 
 	for (var i in split) {
 		formatted += split[i].split(",")[0] + ",";

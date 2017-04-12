@@ -10,5 +10,5 @@ fi
 export PGPASSWORD=carrots
 psql -h localhost -p 5432 ddn_db postgres < database.sql
 
-node sample-data.js
-# node dndn-scraper.js
+# node sample-data.js
+node dndn-scraper.js
