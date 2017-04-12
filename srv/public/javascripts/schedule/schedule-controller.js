@@ -106,6 +106,7 @@ function loadSchedule(scheduleInfo) {
 var selected = {};
 var selectedSections = [];
 var selectedCount = 0;
+var clicked = false;
 
 var daysToNum = {"Mon": 1, "Tue": 2, "Wed": 3,"Thu": 4,"Fri": 5,"Sat": 6,"Sun": 7};
 
@@ -190,10 +191,30 @@ function SelectCourse(node) {
 
 		$a.click(function(e) {
 			e.preventDefault();
-
+			// Add this section to the schedule
 			var index = $(this).attr("data-index");
 			var name = $(this).attr("id-index");
-			addSectionOverlay(index, name, data);
+			if (selectedSections.indexOf(data.sections[index].section_id) != -1 && clicked == true) 
+				removeSectionOverlay(index, name, data);
+			else addSectionOverlay(index, name, data);
+			clicked = true;
+		});
+
+		$a.mouseenter(function() {
+			var index = $(this).attr("data-index");
+			var name = $(this).attr("id-index");
+			if (selectedSections.indexOf(data.sections[index].section_id) == -1)
+				addSectionOverlay(index, name, data);
+			else clicked = true;
+		});
+
+		$a.mouseleave(function() {
+			var index = $(this).attr("data-index");
+			var name = $(this).attr("id-index");
+			if (selectedSections.indexOf(data.sections[index].section_id) != -1 && clicked == false)
+				removeSectionOverlay(index, name, data);
+
+			clicked = false;
 		});
 
 		$p.append($a);
@@ -205,6 +226,16 @@ function SelectCourse(node) {
 		card: $card,
 		overlays: {}
 	};
+}
+
+function removeSectionOverlay(index, name, data) {
+
+	//Remove the section from the selected section list
+	selectedSections.splice(selectedSections.indexOf(data.sections[index].section_id), 1);
+	for (var i in selected[name].overlays[index]) {
+		selected[name].overlays[index][i].remove();
+	}
+	selected[name].overlays[index] = undefined;
 }
 
 function addSectionOverlay(index, name, data) {
