@@ -36,10 +36,10 @@ router.get('/semesters', function(req, res) {
 
 	var q;
 	if(combined) {
-		q = escape("SELECT s.*, f.name as fac_name FROM faculty as f, faculty_contains as fc, course_section as c, semester as s WHERE " +
+		q = escape("SELECT s.*, f.name AS fac_name FROM faculty AS f, faculty_contains AS fc, course_section AS c, semester AS s WHERE " +
 			"c.semester_id=s.id AND c.dept_name=fc.dept_name AND f.name=fc.faculty_name GROUP BY s.id, f.name");
 	} else {
-		q = escape("SELECT s.* FROM semester as s");
+		q = escape("SELECT s.* FROM semester AS s");
 	}
 
 	console.log(q);
@@ -82,7 +82,7 @@ router.get('/semesters', function(req, res) {
 				semesterList.push(result.rows[j]);
 			}
 
-			var q = escape("SELECT f.* FROM faculty as f");
+			var q = escape("SELECT f.* FROM faculty AS f");
 			console.log(q);
 			client.query(q, function(err, result) {
 				client.end();
@@ -118,18 +118,25 @@ router.get('/courses', function(req, res) {
 	var q;
 	if(req.query.semesterId) {
 		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
-			"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
+			"FROM course AS c, faculty_contains AS fc, course_section AS s, department AS d " +
 			"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
 			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
 			req.query.semesterId, req.query.facultyName);
 	} else {
-		q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
-			"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
-			"WHERE s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
-			"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
-			req.query.facultyName);
+		q = escape("SELECT DISTINCT c.*, s.*, c.number AS course_num, c.dept_name AS dept_name " +
+			"FROM (SELECT DISTINCT c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
+				"FROM faculty_contains AS fc, department AS d, " +
+					"(SELECT DISTINCT c.*, p.prereq_num, p.prereq_dept " +
+					"FROM course AS c LEFT JOIN prerequisite AS p " +
+					"ON p.course_num=c.number AND p.course_dept=c.dept_name) AS c " +
+				"CROSS JOIN course_section AS s " +
+				"WHERE d.name=c.dept_name AND d.name=fc.dept_name AND fc.faculty_name=%L AND c.dept_name=s.dept_name " +
+			") AS c " +
+			"LEFT JOIN course_section AS s ON c.number=s.course_num AND c.dept_name=s.dept_name",
+		req.query.facultyName);
 	}
 	console.log(q);
+
 	client.query(q, function (err, result) {
 		client.end();
 		if(err) {
@@ -159,23 +166,45 @@ router.get('/courses', function(req, res) {
 					name: obj.name,
 					number: obj.course_num,
 					sections: [],
-					semesters: []
+					semesters: [],
+					prerequisites: []
 				};
 			}
 			parent = parent[obj.course_num];
 
-			parent.sections.push({
-				section_number: obj.number,
-				type: obj.type,
-				time: obj.time,
-				location: obj.location,
-				section_id: obj.id,
-				instr_name: obj.ta_name || obj.instr_name,
-				semester_id: obj.semester_id
-			});
+			if (obj.prereq_num) {
+				var prereq = {
+					dept_name: obj.prereq_dept,
+					number: obj.prereq_num
+				};
 
-			if(parent.semesters.indexOf(obj.semester_id) == -1) {
-				parent.semesters.push(obj.semester_id);
+				var exists = false;
+				for (var j = 0; j < parent.prerequisites.length; j++) {
+					var p = parent.prerequisites[j];
+					if(p.dept_name == prereq.dept_name && p.number == prereq.number) {
+						exists = true;
+					}
+				}
+
+				if (!exists) {
+					parent.prerequisites.push(prereq);
+				}
+			}
+
+			if (obj.id) {
+				parent.sections.push({
+					section_number: obj.course_num,
+					type: obj.type,
+					time: obj.time,
+					location: obj.location,
+					section_id: obj.id,
+					instr_name: obj.ta_name || obj.instr_name,
+					semester_id: obj.semester_id
+				});
+
+				if (parent.semesters.indexOf(obj.semester_id) == -1) {
+					parent.semesters.push(obj.semester_id);
+				}
 			}
 		}
 
@@ -215,7 +244,7 @@ router.get('/login', function(req, res) {
 
 /*
 	var q = escape("SELECT DISTINCT s.*, c.*, fc.faculty_name AS fac_name, d.full_name AS dept_full_name " +
-		"FROM course as c, faculty_contains as fc, course_section as s, department as d " +
+		"FROM course AS c, faculty_contains AS fc, course_section AS s, department AS d " +
 		"WHERE s.semester_id=%s AND s.dept_name=fc.dept_name AND c.number=s.course_num AND " +
 		"c.dept_name=s.dept_name AND fc.faculty_name=%L AND d.name=s.dept_name",
 		req.query.email, req.query.password);

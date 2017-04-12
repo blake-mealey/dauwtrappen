@@ -216,16 +216,38 @@ function displayCourse(course, $parent) {
 	});
 
 	createLinkHeader($course, "<h4>", course.number + ": " + course.name, "/courses/" + course.fac_name + "/" + course.dept_name + "/" + course.number);
-
 	$course.append($("<p>", { text: course.description }));
+
+	if(course.prerequisites.length > 0) {
+		var $prereqs = $("<p><b>Prerequisites:</b> </p>");
+		for (var i = 0; i < course.prerequisites.length; i++) {
+			var prereq = course.prerequisites[i];
+			var $a = $("<a>", {
+				href: "",
+				text: prereq.dept_name + " " + prereq.number,
+				"data-link": "/courses/" + prereq.dept_name[0] + "/" + prereq.dept_name + "/" + prereq.number
+			});
+			$a.click(function(e) {
+				e.preventDefault();
+				history.pushState(null, null, $(this).data("link"));
+				reloadContent();
+			});
+			$prereqs.append($a);
+
+			if(i != course.prerequisites.length - 1) {
+				$prereqs.append(", ");
+			}
+		}
+		$course.append($prereqs);
+	}
 
 	var offeredText;
 	if(course.semesters.length == 0) {
 		offeredText = "Not currently offered."
 	} else {
 		offeredText = "Offered in: ";
-		for (var i = 0; i < course.semesters.length; i++) {
-			offeredText += semesterNames[course.semesters[i]] + ((i != course.semesters.length - 1) ? ", " : "");
+		for (var j = 0; j < course.semesters.length; j++) {
+			offeredText += semesterNames[course.semesters[j]] + ((j != course.semesters.length - 1) ? ", " : "");
 		}
 	}
 	$course.append($("<b>", { text: offeredText }));
