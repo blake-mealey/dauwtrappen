@@ -56,9 +56,10 @@ $(document).ready(function () {
 	});
 
 	$("#load-btn").click(function() {
-		console.log("Clicked load");
+		console.log("Loading");
 		$.get("/data/loadSchedule", {}, function(res) {
 			clearSelected();
+			console.log(res);
 			loadSchedule(res);
 		});
 
@@ -68,7 +69,38 @@ $(document).ready(function () {
 });
 
 function loadSchedule(scheduleInfo) {
-	console.log(scheduleInfo);
+
+	//scheduleInfo contains 2 bits of information: course 
+	for (var i in scheduleInfo.schedule) {
+		var temp = scheduleInfo.schedule[i];
+		var data = courseData[temp.dept_name[0]][temp.dept_name][temp.course_num[0]+"00"][temp.course_num];
+
+		data.sections.sort(
+			function(x, y) {
+				if(x.type == y.type) {
+					return 0;
+				} else if (x.type == "LEC") {
+					return -1;
+				} else if (x.type == "LAB" && y.type == "LEC"){
+					return 1;
+				} else {
+					return 1;
+				}
+			}
+		);
+
+		SelectCourse({
+			data: data,
+			type: "course"
+		});
+
+		for(var j = 0; j < data.sections.length; j++) {
+			if (data.sections[j].section_id == temp.id) {
+				addSectionOverlay(j, temp.dept_name + " " + temp.course_num, data);
+				break;
+			}
+		}
+	}
 }
 
 var selected = {};
@@ -123,7 +155,6 @@ function SelectCourse(node) {
 		if(--selectedCount == 0) {
 			$("#get-started").removeClass("hidden");
 		}
-		console.log(selectedSections);
 	});
 	var $i = $("<i>", {
 		class: "material-icons",
@@ -147,70 +178,22 @@ function SelectCourse(node) {
 	);
 
 	for(var i = 0; i < data.sections.length; i++) {
-		console.log(data.sections[i]);
 		var section = data.sections[i];
 		var $p = $("<p>");
 		var formattedTime = formatTime(section.time);
 		var $a = $("<a>", {
 			text: section.type + " " + section.section_number + ": " + formattedTime,
 			href: "",
-			"data-index": i
+			"data-index": i,
+			"id-index": id
 		});
 
 		$a.click(function(e) {
 			e.preventDefault();
 
 			var index = $(this).attr("data-index");
-
-			if (selected[id].overlays[index] || data.sections[index].time == "") return;
-
-			var totalTime = data.sections[index].time.split(".");
-			if (totalTime.length > 0) totalTime.splice(totalTime.length-1, 1);
-
-			console.log(totalTime);
-
-			//Push the section id
-			selectedSections.push(data.sections[index].section_id);
-			console.log(selectedSections);
-
-			// for each class time t in time
-			for (var t in totalTime) {
-
-				var split = totalTime[t].split(",");
-				var day = split[0];
-				var t1 = split[1];
-				var t2 = split[2];
-				console.log(totalTime[t]);
-
-				var $classOverlay = $("<div>", {
-					class: "class-overlay",
-					text: split[1]+"-"+split[2],
-					"data-index": data.sections[index].section_id
-				});
-
-				//Find the time difference in minutes
-				var diff = getTimeDifference(t1, t2);
-				var start = parseTime(t1);
-
-				//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
-				var scale = diff / 60;
-				var top = ((start.hour - 6) * 6.666) + (6.666 * start.minute/60);
-
-				$classOverlay.css({
-					top: top + "%", 
-					left: (daysToNum[day])/8 * 100 + 0.25 + "%",
-					height: 6.66*scale + "%",
-					width: "12%"
-				});
-
-				$("table").append($classOverlay);
-
-				if (selected[id].overlays[index]) selected[id].overlays[index].push($classOverlay);
-				else { 
-					selected[id].overlays[index] = [];
-					selected[id].overlays[index].push($classOverlay);
-				};	
-			} 
+			var name = $(this).attr("id-index");
+			addSectionOverlay(index, name, data);
 		});
 
 		$p.append($a);
@@ -224,11 +207,65 @@ function SelectCourse(node) {
 	};
 }
 
+function addSectionOverlay(index, name, data) {
+
+	if (selected[name].overlays[index] || data.sections[index].time == "") return;
+
+	var totalTime = data.sections[index].time.split(".");
+	if (totalTime.length > 0) totalTime.splice(totalTime.length-1, 1);
+
+
+	//Push the section id
+	selectedSections.push(data.sections[index].section_id);
+
+	// for each class time t in time
+	for (var t in totalTime) {
+
+		var split = totalTime[t].split(",");
+		var day = split[0];
+		var t1 = split[1];
+		var t2 = split[2];
+
+		var $classOverlay = $("<div>", {
+			class: "class-overlay",
+			text: name + " " + data.sections[index].type + data.sections[index].section_number,
+			"data-index": data.sections[index].section_id
+		});
+
+		$classOverlay.append("<br>");
+		$classOverlay.append(split[1]+"-"+split[2]);
+
+		//Find the time difference in minutes
+		var diff = getTimeDifference(t1, t2);
+		var start = parseTime(t1);
+
+		//Calculate the difference in the courses start time vs end time to calculate the height and top values of this class
+		var scale = diff / 60;
+		var top = ((start.hour - 6) * 6.666) + (6.666 * start.minute/60);
+
+		$classOverlay.css({
+			top: top + "%", 
+			left: (daysToNum[day])/8 * 100 + 0.25 + "%",
+			height: 6.66*scale + "%",
+			width: "12%"
+		});
+
+		$("table").append($classOverlay);
+
+		if (selected[name].overlays[index]) selected[name].overlays[index].push($classOverlay);
+		else { 
+			selected[name].overlays[index] = [];
+			selected[name].overlays[index].push($classOverlay);
+		};	
+	} 
+}
+
 //Removes all of the current selected courses and schedules
 function clearSelected() {
-	console.log(selectedSections);
-	console.log(selected);
+
 	for (var id in selected) {
+		if (!selected[id]) continue;
+		selected[id].card.remove();
 		for (var overlayArray in selected[id].overlays) {
 			if (!selected[id].overlays.hasOwnProperty(overlayArray)) continue;
 			for (var overlay in selected[id].overlays[overlayArray]) {
@@ -241,13 +278,11 @@ function clearSelected() {
 			}
 		}
 
-		selected[id] = undefined;
 		if(--selectedCount == 0) {
 			$("#get-started").removeClass("hidden");
 		}
 	}
-	console.log(selectedSections);
-	console.log(selected);
+	selected = {};
 }
 
 //Assume time1 and time2 follow this format: 9:00AM
