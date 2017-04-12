@@ -12,8 +12,19 @@ block head
 block body
 	include includes/sidebar
 	.ui-layout-east
-		button#save-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", style={width: "45%", height: "40px", "margin-right": "2.5%", "margin-left": "2.5%"}) Save
-		button#load-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", style={width: "45%", height: "40px", "margin-right": "2.5%", "margin-left": "2.5%"}) Load
+		h3(style="margin-top: 0") Selected Courses
+		// Right aligned menu below button
+		button#courses-menu.mdl-button.mdl-js-button.mdl-button--icon(style="position: absolute; top: 15px; right: 15px;")
+			i.material-icons more_vert
+		ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for='courses-menu')
+			li#save-btn.mdl-menu__item Save
+			li#load-btn.mdl-menu__item Load
+			li.mdl-menu__item(disabled='') Edit Name
+			li.mdl-menu__item(disabled='') Clear
+			li.mdl-menu__item(disabled='') Export as...
+
+		//button#save-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", style={width: "45%", height: "40px", "margin-right": "2.5%", "margin-left": "2.5%"}) Save
+		//button#load-btn(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", style={width: "45%", height: "40px", "margin-right": "2.5%", "margin-left": "2.5%"}) Load
 
 		p 
 		h4#get-started Select some courses to get started!
