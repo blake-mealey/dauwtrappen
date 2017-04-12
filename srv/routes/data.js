@@ -355,6 +355,10 @@ router.get('/loadSchedule', function(req, res) {
 	});
 });
 
+//Checks if the given value is an array or not
+function check_array (value) {
+    return value && typeof value === 'object' && value.constructor === Array;
+}
 
 router.post('/saveSchedule', function (req, res) {
 	console.log(req.body);
@@ -369,7 +373,12 @@ router.post('/saveSchedule', function (req, res) {
 		return;
 	}
 
-	req.body.sections = req.body["sections[]"];
+	//Solves the 1 element array issue where if only 1 section is selected, then this wont be an array, it will be a string
+	if (!check_array(req.body["sections[]"])) {
+		var temp = req.body["sections[]"];
+		req.body["sections[]"] = [];
+		req.body["sections[]"].push(temp);
+	}
 
 	var client = new Client(config);
 	client.connect();
@@ -377,7 +386,7 @@ router.post('/saveSchedule', function (req, res) {
 
 	//START: creates query and gets results
 	var q = escape("INSERT INTO schedule " +
-		"VALUES ('1',%L,'DESCRIPTION','blake@ben.com')",
+		"VALUES ('1',%L,'DESCRIPTION','blakemealey@gmail.com')",
 		req.body.scheduleName);
 	client.query(q, function (err, result) {
 		if(err) {
@@ -388,13 +397,14 @@ router.post('/saveSchedule', function (req, res) {
 
 		var index = 0;
 		function each() {
-			var element = req.body.sections[index++];
+			var element = req.body["sections[]"][index++];
 			if(!element) {
 				client.end();
 				res.send(success({}));
 				return;
 			}
 
+			console.log(element);
 			var q = escape("INSERT INTO schedule_section " +
 				"VALUES ('1',%s)",
 				element);
