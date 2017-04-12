@@ -58,6 +58,7 @@ $(document).ready(function () {
 	$("#load-btn").click(function() {
 		console.log("Clicked load");
 		$.get("/data/loadSchedule", {}, function(res) {
+			clearSelected();
 			loadSchedule(res);
 		});
 
@@ -74,7 +75,7 @@ var selected = {};
 var selectedSections = [];
 var selectedCount = 0;
 
-var daysToNum = {"mon": 1, "tue": 2, "wen": 3,"thur": 4,"fri": 5,"sat": 6,"sun": 7};
+var daysToNum = {"Mon": 1, "Tue": 2, "Wed": 3,"Thu": 4,"Fri": 5,"Sat": 6,"Sun": 7};
 
 function SelectCourse(node) {
 
@@ -110,10 +111,10 @@ function SelectCourse(node) {
 			if (!selected[id].overlays.hasOwnProperty(overlayArray)) continue;
 			for (var overlay in selected[id].overlays[overlayArray]) {
 				if (!selected[id].overlays[overlayArray].hasOwnProperty(overlay)) continue;
-				var section_id = selected[id].overlays[overlayArray][overlay]("data-index");
+				var section_id = Number(selected[id].overlays[overlayArray][overlay].attr("data-index"));
 				var index = selectedSections.indexOf(section_id);
 				if (index > -1) selectedSections.splice(index, 1);
-				
+
 				selected[id].overlays[overlayArray][overlay].remove();
 			}
 		}
@@ -122,6 +123,7 @@ function SelectCourse(node) {
 		if(--selectedCount == 0) {
 			$("#get-started").removeClass("hidden");
 		}
+		console.log(selectedSections);
 	});
 	var $i = $("<i>", {
 		class: "material-icons",
@@ -165,6 +167,7 @@ function SelectCourse(node) {
 			var totalTime = data.sections[index].time.split(".");
 			//Push the section id
 			selectedSections.push(data.sections[index].section_id);
+			console.log(selectedSections);
 
 			// for each class time t in time
 			for (var t in totalTime) {
@@ -215,6 +218,32 @@ function SelectCourse(node) {
 		card: $card,
 		overlays: {}
 	};
+}
+
+//Removes all of the current selected courses and schedules
+function clearSelected() {
+	console.log(selectedSections);
+	console.log(selected);
+	for (var id in selected) {
+		for (var overlayArray in selected[id].overlays) {
+			if (!selected[id].overlays.hasOwnProperty(overlayArray)) continue;
+			for (var overlay in selected[id].overlays[overlayArray]) {
+				if (!selected[id].overlays[overlayArray].hasOwnProperty(overlay)) continue;
+				var section_id = Number(selected[id].overlays[overlayArray][overlay].attr("data-index"));
+				var index = selectedSections.indexOf(section_id);
+				if (index > -1) selectedSections.splice(index, 1);
+
+				selected[id].overlays[overlayArray][overlay].remove();
+			}
+		}
+
+		selected[id] = undefined;
+		if(--selectedCount == 0) {
+			$("#get-started").removeClass("hidden");
+		}
+	}
+	console.log(selectedSections);
+	console.log(selected);
 }
 
 //Assume time1 and time2 follow this format: 9:00AM
