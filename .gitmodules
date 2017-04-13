@@ -1,3 +1,0 @@
-[submodule "scraper"]
-	path = scraper
-	url = git@github.com:ttoocs/uofc-scraper.git
