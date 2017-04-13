@@ -1,0 +1,66 @@
+#Site for finding the open-access thing:
+http://ucalgary.ca/registrar/registration
+
+#Link-location:
+https://csprd.ucalgary.ca/psauthent/class-search/public
+
+#Selnium will probably be needed.
+  #Java, Python, C#, Ruby.
+  Probably java..?
+
+#DB-interaction: 
+  Need to know how to add elements to the db, -requires the DB... I'll just leave that for later.
+ 
+
+#Parsing courses:
+  Details:
+    Status:
+    Class Number:
+    Session:
+    Units:
+    Class Components:
+    Career:
+    Dates:
+    Grading:
+    Location:
+    Campus:
+  
+  Meeting Information:
+    Days & Times:
+    Room:
+    Instructor:
+    Meeting Dates:
+
+  Enrollment:
+    Enrollment Requirments: 
+      Restricted: 
+      Prerequisites:
+    Class Attributes: 
+      Half-Course (??)
+      GFC Hours (3-0) (??)
+
+  Class Restrictions:
+    ID:
+    Restriction Nbr:
+    Start Date:
+    End Date:
+    Reserved Seats:
+    Description:
+  
+  Class Availability:
+    Class Capacity:
+    Enrollment Total:
+    Available Seats: 
+    Wait List Capacity:
+    Wait List Total:
+  
+  Notes:
+    Class Notes:
+  
+  Description:
+    Desc:
+    Prerequisites:
+    Antirequisites:
+    Notes:
+  
+  Textbooks/Other Materials:
