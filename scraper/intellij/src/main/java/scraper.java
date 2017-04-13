@@ -4,15 +4,10 @@ import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.*;
 import java.util.*;
 //import org.
@@ -55,72 +50,12 @@ public class scraper {
         //Gets the internal iframe.
         driver.get(driver.findElement(By.id("ptifrmtgtframe")).getAttribute("src"));
 
-
     }
 
-    public static void try_scrape() {
-        String baseUrl = "https://csprd.ucalgary.ca/";
-        //This was the one generated from SeleniumIDE.
-        driver.get(baseUrl + "/psp/csprd/EMPLOYEE/CAMPUS/c/COMMUNITY_ACCESS.CLASS_SEARCH.GBL?AUTH=Vm02V2M0RTAxTm1aRG5jelg0Y3NNZz09");
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        new Select(driver.findElement(By.id("CLASS_SRCH_WRK2_STRM$35$"))).selectByVisibleText("2177 - Fall 2017");
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_SUBJECT_SRCH$0")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        new Select(driver.findElement(By.id("SSR_CLSRCH_WRK_SUBJECT_SRCH$0"))).selectByVisibleText("ACCT-Accounting");
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.cssSelector("option[value=\"ACCT\"]")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_SSR_EXACT_MATCH1$1")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        new Select(driver.findElement(By.id("SSR_CLSRCH_WRK_SSR_EXACT_MATCH1$1"))).selectByVisibleText("greater than or equal to");
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.cssSelector("option[value=\"G\"]")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_CATALOG_NBR$1")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_CATALOG_NBR$1")).clear();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_CATALOG_NBR$1")).sendKeys("0");
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_ACAD_CAREER$2")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        new Select(driver.findElement(By.id("SSR_CLSRCH_WRK_ACAD_CAREER$2"))).selectByVisibleText("Undergraduate Programs");
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.cssSelector("option[value=\"UGRD\"]")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_SSR_OPEN_ONLY$3")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_OEE_IND$4")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.name("DERIVED_CLSRCH_SSR_EXPAND_COLLAPS$149$$IMG$1")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_SSR_START_TIME_OPR$5")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_SSR_START_TIME_OPR$5")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_OEE_IND_LBL$4")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_OEE_IND$4")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.id("SSR_CLSRCH_WRK_OEE_IND$4")).click();
-        try {            Thread.sleep(1000);        } catch (InterruptedException e) {}
-        driver.findElement(By.name("DERIVED_CLSRCH_SSR_EXPAND_COLLAPS$149$$IMG$1")).click();
-        driver.findElement(By.id("SSR_CLSRCH_WRK_OEE_IND$4")).click();
-        driver.findElement(By.id("CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH")).click();
-        driver.findElement(By.id("#ICSave")).click();
-        driver.findElement(By.id("MTG_CLASS_NBR$0")).click();
-        driver.findElement(By.id("MTG_CLASS_NBR$0")).click();
-    }
-
-    static boolean run_setup = false;
-
+    static boolean setupHasRun = false;
     public static WebDriver setup_driver(){
         return setup_driver(null); //Give it the default.
     }
-
     public static WebDriver setup_driver(String useDriver){
         //ChromeDriverManager.getInstance().setup();
         //InternetExplorerDriverManager.getInstance().setup();
@@ -131,18 +66,15 @@ public class scraper {
         if(useDriver == null)
             useDriver = "f";    //Default.
 
-        if(!run_setup) {
+        if(!setupHasRun) {
             if(useDriver.contains("p"))
                 PhantomJsDriverManager.getInstance().setup();
             if(useDriver.contains("c"))
                 ChromeDriverManager.getInstance().setup();
             if(useDriver.contains("f"))
                 FirefoxDriverManager.getInstance().setup();
-
-            run_setup = true;
+            setupHasRun = true;
         }
-
-
 
         if(useDriver.contains("p"))
             driver = new PhantomJSDriver();
@@ -150,8 +82,6 @@ public class scraper {
             driver = new ChromeDriver();
         if(useDriver.contains("f"))
             driver = new FirefoxDriver();
-
-       //System.out.println(FirefoxDriver.PROFILE );
 
         return driver;
     }
@@ -162,9 +92,11 @@ public class scraper {
 
         boolean noSQL = false;
         boolean noScrape = false;
-        boolean MultiThread =false;
+        boolean multiThread =false;
+        boolean dumbTest = false; //Manual SQL tests.
         ArrayList<Integer> scrapeSemesters = null;
-        String useDriver = null;
+
+        String scrapeDriverType = null;
 
         //while(int i=0; i< args ; i++)
         int piter=0;
@@ -186,30 +118,32 @@ public class scraper {
                     }
                     break;
                 case "--multithread":case"-mt":case"-m":
-                    MultiThread = true;
+                    multiThread = true;
                     break;
                 case "--firefox":case"-ff":case"-f":
-                    useDriver = "f";
+                    scrapeDriverType = "f";
+                    break;
                 case "--chromium":case"--chrome":case"-c":
-                    useDriver = "c";
+                    scrapeDriverType = "c";
+                    break;
                 case "--phantomjs":case"--phantom":case"-p":
-                    useDriver = "p";
+                    scrapeDriverType = "p";
+                    break;
+                case "--dumbTest":
+                    dumbTest = true;
+                    break;
             }
 
         }
 
-
-        boolean SQLFUN = false; //Manual SQL tests.
-        if(SQLFUN) {
-            setup_sql();
-            semesterData testdata = semesterData.loadAsStr(2161);
-            //semesterData testdata = new semesterData(1337);//semesterData.loadSemester(1337);
-            //testdata.sections.put(42, new sectionData(42, "tut", "01", "lATER", "Somewhere-else","AROOM", 1337, "some bloke", "some better bloke.", "123", "AWE", "NOT OPEN FOR ANYONE"));
+        if(dumbTest) {
+            setupSql();
+            //semesterData testdata = semesterData.loadAsStr(2161); //Raw-load data.
+            semesterData testdata = new semesterData(1337);
+            testdata.sections.put(42, new sectionData(42, "tut", "01", "lATER", "Somewhere-else","AROOM", 1337, "some bloke", "some better bloke.", "123", "AWE", "NOT OPEN FOR ANYONE"));
             Semesters = new HashMap<Integer,String>();
             Semesters.put(testdata.semester_id, "leet");
-            //Semesters.put(1337,"LEET");
-            //if (testdata != null) {
-                //System.out.println(testdata.toString());
+
             putSQL(testdata);
             System.exit(0);
         }
@@ -237,16 +171,15 @@ public class scraper {
 
         boolean SQL_INNER = true;
 
-        driver = setup_driver(useDriver);
+        driver = setup_driver(scrapeDriverType);
 
         //GET SEMESTERS! YAY!
-        Semesters = GetSemesters();
+        Semesters = getSemesters();
 
         //Get ready for data!
         HashMap<Integer,semesterData> sdata = new HashMap<Integer,semesterData>();
 
         HashSet<Thread> threads = new HashSet<Thread>();
-
 
         //To handle parsing, we put all semesters in this.
         if(scrapeSemesters == null){
@@ -264,7 +197,7 @@ public class scraper {
             if(r != null && r.complete){    //Try to load if available.
                 s=r;    //TODO: Handle partal loads.
             }else {
-                if(MultiThread){
+                if(multiThread){
                     Thread t = new Thread(s);
                     threads.add(t);
                     t.start();
@@ -281,7 +214,7 @@ public class scraper {
             }
         }
 
-        if(MultiThread){
+        if(multiThread){
             for(Thread t : threads){
                 try{t.join();}catch(Exception e){}
             }
@@ -309,7 +242,7 @@ public class scraper {
         return elem.findElements(By.tagName("option"));
     }
 
-    public static HashMap<Integer,String> GetSemesters(){
+    public static HashMap<Integer,String> getSemesters(){
         get_access(driver);
 
         List<WebElement> elems = getOptions(driver,Term_Selection_id);
@@ -338,15 +271,15 @@ public class scraper {
     }
 
 
-    public static void SearchFor(WebDriver drv, semesterData semester, String subject, int contains){
-        SearchFor(drv,semester,subject,contains,"E");
+    public static void searchFor(WebDriver drv, semesterData semester, String subject, int contains){
+        searchFor(drv,semester,subject,contains,"E");
     }
     //Types:
     //E - Exactly
     //C - Contains
     //G - Greater than or equal to
     //T - Less than or equal to
-    public static void SearchFor(WebDriver drv, semesterData semester, String subject, int contains, String type){
+    public static void searchFor(WebDriver drv, semesterData semester, String subject, int contains, String type){
 
         subject = subject.toUpperCase();
 
@@ -428,7 +361,7 @@ public class scraper {
     static int sqlPort = 5432;
 
     static boolean sql_setup = false;
-    public static void setup_sql(){
+    public static void setupSql(){
         if(sql_setup)
             return;
         sql_setup = true;
@@ -447,11 +380,11 @@ public class scraper {
             System.out.println("SQL FAILED, ABORTING!");
             System.exit(1);
         }
-        nuke_db();
+        nukeDb();
     }
-    public static void nuke_db(){
+    public static void nukeDb(){
         //Nuke the database!
-        scraper.setup_sql();
+        scraper.setupSql();
         try {
             sqlCon.createStatement().execute(new Scanner(new File("database.sql")).useDelimiter("\\Z").next()); //Use the database.sql file to nuke it.
         }catch(Exception e11){
@@ -459,7 +392,7 @@ public class scraper {
         }
     }
     public static void putSQL(semesterData semester){
-        scraper.setup_sql(); //Try to setup SQL.
+        scraper.setupSql(); //Try to setup SQL.
 
         HashSet<String> Departments = new HashSet<String>();
         //Faculties made from first char of Departments.

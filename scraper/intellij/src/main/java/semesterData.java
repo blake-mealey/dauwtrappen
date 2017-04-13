@@ -1,4 +1,3 @@
-import org.apache.commons.io.output.WriterOutputStream;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
@@ -6,7 +5,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 
 import static java.lang.Integer.min;
 
@@ -53,7 +51,7 @@ public class semesterData extends Thread implements Serializable{
     }
     public void run(WebDriver drv){
 
-        this.ParseSubjects(drv);
+        this.parseSubjects(drv);
         this.subjects_parsed=true;
         this.getData(drv);
         this.complete = true;
@@ -62,7 +60,7 @@ public class semesterData extends Thread implements Serializable{
     }
 
 
-    public void ParseSubjects(WebDriver drv){
+    public void parseSubjects(WebDriver drv){
         //WebDriver drv = scraper.driver;
         selectSemester(drv, semester_id);
         //
@@ -93,13 +91,13 @@ public class semesterData extends Thread implements Serializable{
     }
 
     public void getData(){
-        getData2(null,this);
+        getData(null,this);
     }
     public void getData(WebDriver drv){
-        getData2(drv,this);
+        getData(drv,this);
     }
 
-    public static void getData2(WebDriver drv, semesterData semester){
+    public static void getData(WebDriver drv, semesterData semester){
         if(drv == null){
             drv = scraper.setup_driver();
         }
@@ -109,7 +107,7 @@ public class semesterData extends Thread implements Serializable{
 //                continue;
 
             for (int i = 0; i < 10; i++) { //Does it contain a 0? How about 1...
-                scraper.SearchFor(drv, semester, subject, i, "C");
+                scraper.searchFor(drv, semester, subject, i, "C");
                 try {
                     String err = drv.findElement(By.id(scraper.search_msg_id)).getText();
                     if (err.toLowerCase().contains("no results"))
@@ -132,7 +130,7 @@ public class semesterData extends Thread implements Serializable{
 
     public static void getSubjectIterative(WebDriver drv, semesterData semester, String subject){
         for(int i=1; i<1000; i++){
-            scraper.SearchFor(drv,semester,subject,i);
+            scraper.searchFor(drv,semester,subject,i);
             try {
                 String err = drv.findElement(By.id(scraper.search_msg_id)).getText();
                 if (err.toLowerCase().contains("no results"))
