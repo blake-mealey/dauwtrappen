@@ -42,7 +42,14 @@ public class semesterData extends Thread implements Serializable{
 
     public void run(){
         WebDriver drv = scraper.setup_driver();
+        scraper.get_access(drv);
+        //try{Thread.sleep(10000);}catch(Exception e){};
         run(drv);
+        try {
+            drv.close();
+            drv.quit();
+        }catch(Exception e){}
+
     }
     public void run(WebDriver drv){
 
@@ -188,6 +195,8 @@ public class semesterData extends Thread implements Serializable{
 
         scraper.wait(drv);  //Wait for anything.
 
+
+        //For semester 2167 this seems to be missing.
         WebElement e;
         try {
             e = drv.findElement(By.id("win0divSSR_CLSRSLT_WRK_GROUPBOX1")).findElement(By.className("SSSGROUPBOX"));

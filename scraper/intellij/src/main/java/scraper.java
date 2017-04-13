@@ -4,6 +4,9 @@ import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.Select;
 
@@ -135,8 +138,11 @@ public class scraper {
                 ChromeDriverManager.getInstance().setup();
             if(useDriver.contains("f"))
                 FirefoxDriverManager.getInstance().setup();
+
             run_setup = true;
         }
+
+
 
         if(useDriver.contains("p"))
             driver = new PhantomJSDriver();
@@ -144,6 +150,8 @@ public class scraper {
             driver = new ChromeDriver();
         if(useDriver.contains("f"))
             driver = new FirefoxDriver();
+
+       //System.out.println(FirefoxDriver.PROFILE );
 
         return driver;
     }
